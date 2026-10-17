@@ -168,7 +168,7 @@ func LoadZip(path string) (*Pack, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 	fi, err := f.Stat()
 	if err != nil {
 		return nil, err
@@ -202,9 +202,12 @@ func loadFromZip(zr *zip.Reader, source string) (*Pack, error) {
 			return nil, fmt.Errorf("opening %q: %w", norm, err)
 		}
 		data, err := io.ReadAll(rc)
-		rc.Close()
+		rerr := rc.Close()
 		if err != nil {
 			return nil, fmt.Errorf("reading %q: %w", norm, err)
+		}
+		if rerr != nil {
+			return nil, fmt.Errorf("closing %q: %w", norm, rerr)
 		}
 		total += int64(len(data))
 		if total > MaxTotalUncompressed {
@@ -279,7 +282,7 @@ func assemble(files []*File, source string, warnings []Finding) (*Pack, error) {
 		}
 	}
 	if manifest != ManifestPath {
-		warnings = append(warnings, Finding{
+		p.Warnings = append(p.Warnings, Finding{
 			Severity: SeverityWarning,
 			Path:     manifest,
 			Msg:      "manifest has non-canonical casing; the engine requires lowercase \"manifest.json\"",

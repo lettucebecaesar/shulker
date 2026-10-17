@@ -219,7 +219,8 @@ func Run(p *pack.Pack, inDocs map[string]jsonx.Value, inG *graph.Graph, opts Opt
 // normalizeNumbers rewrites every number literal in place through the
 // provably-safe float32 shortener.
 func normalizeNumbers(v jsonx.Value) {
-	jsonx.Walk(v, func(_ string, n jsonx.Value) error {
+	// The walk callback never returns an error (it only rewrites numbers).
+	_ = jsonx.Walk(v, func(_ string, n jsonx.Value) error {
 		if num, ok := n.(*jsonx.Number); ok {
 			num.Raw = jsonx.NormalizeNumber(num.Raw)
 		}

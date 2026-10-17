@@ -115,9 +115,6 @@ func (r *Result) checkAtlasShortNameCollisions(g *graph.Graph) {
 	if g == nil {
 		return
 	}
-	// The graph's shortNameIndex already maps short name -> provider files.
-	type pair struct{ terrain, item string }
-	// Rebuild from provides for clarity.
 	for name, files := range g.ShortNameIndex() {
 		if len(files) <= 1 {
 			continue

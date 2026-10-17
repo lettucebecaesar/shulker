@@ -233,7 +233,7 @@ func withZipBytes(t *testing.T, raw []byte) map[string][]byte {
 		if err != nil {
 			t.Fatal(err)
 		}
-		rc.Close()
+		_ = rc.Close()
 		out[zf.Name] = data
 	}
 	return out
@@ -365,11 +365,17 @@ func TestRejectsDuplicateEntries(t *testing.T) {
 	zw := zip.NewWriter(&buf)
 	for _, name := range []string{"manifest.json", "manifest.json"} {
 		w, _ := zw.Create(name)
-		w.Write([]byte(validManifest))
+		if _, err := w.Write([]byte(validManifest)); err != nil {
+			t.Fatal(err)
+		}
 	}
-	zw.Close()
+	if err := zw.Close(); err != nil {
+		t.Fatal(err)
+	}
 	path := filepath.Join(t.TempDir(), "dup.mcpack")
-	os.WriteFile(path, buf.Bytes(), 0o644)
+	if err := os.WriteFile(path, buf.Bytes(), 0o644); err != nil {
+		t.Fatal(err)
+	}
 	if _, err := Load(path); err == nil || !strings.Contains(err.Error(), "duplicate") {
 		t.Fatalf("expected duplicate rejection, got %v", err)
 	}

@@ -41,8 +41,8 @@ func IsDenyListed(p string) bool {
 // NeverRename are individual engine-fixed files. Registries can be minified
 // and their path references rewritten, but the files themselves stay.
 func NeverRename(p string) bool {
-	switch {
-	case p == "manifest.json", p == "pack_icon.png":
+	switch p {
+	case "manifest.json", "pack_icon.png":
 		return true
 	}
 	if strings.HasSuffix(p, ".texture_set.json") {

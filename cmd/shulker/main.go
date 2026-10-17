@@ -120,6 +120,37 @@ func fail(format string, args ...any) {
 	os.Exit(1)
 }
 
+// reorderArgs lets users write flags before or after positionals
+// (`shulker squash pack.mcpack --no-rename`), which the stdlib flag package
+// alone does not accept. valueFlags lists the long flags that consume a
+// separate value token; those must appear as `--flag value` or `--flag=value`.
+func reorderArgs(args []string, valueFlags map[string]bool) (flags, rest []string) {
+	for i := 0; i < len(args); i++ {
+		a := args[i]
+		if len(a) > 1 && a[0] == '-' {
+			flags = append(flags, a)
+			name := a
+			if eq := strings.IndexByte(a, '='); eq >= 0 {
+				name = a[:eq]
+			}
+			if valueFlags[name] && !strings.Contains(a, "=") && i+1 < len(args) {
+				i++
+				flags = append(flags, args[i])
+			}
+			continue
+		}
+		rest = append(rest, a)
+	}
+	return flags, rest
+}
+
+// squashValueFlags are the squash flags that take a separate value.
+var squashValueFlags = map[string]bool{
+	"--out-map": true,
+	"--report":  true,
+	"--workers": true,
+}
+
 // ---------------------------------------------------------------- squash
 
 func cmdSquash(args []string) {
@@ -136,8 +167,10 @@ func cmdSquash(args []string) {
 	noCache := fs.Bool("no-cache", false, "disable the transform cache")
 	workers := fs.Int("workers", 8, "parallel PNG workers")
 	quiet := fs.Bool("q", false, "quiet")
-	fs.Parse(args)
-	rest := fs.Args()
+	// ExitOnError means Parse exits the process on bad flags; the returned
+	// error is always nil but errcheck insists, and honestly so do we.
+	flagArgs, rest := reorderArgs(args, squashValueFlags)
+	_ = fs.Parse(flagArgs)
 	if len(rest) < 1 || len(rest) > 2 {
 		fmt.Fprint(os.Stderr, usageText)
 		os.Exit(2)
@@ -233,8 +266,8 @@ func isDir(path string) bool {
 func cmdCheck(args []string) {
 	fs := flag.NewFlagSet("check", flag.ExitOnError)
 	fs.Usage = func() { fmt.Fprint(os.Stderr, usageText) }
-	fs.Parse(args)
-	rest := fs.Args()
+	flagArgs, rest := reorderArgs(args, nil)
+	_ = fs.Parse(flagArgs) // ExitOnError handles bad flags
 	if len(rest) != 1 {
 		fmt.Fprint(os.Stderr, usageText)
 		os.Exit(2)
@@ -307,8 +340,8 @@ func cmdMap(args []string) {
 		fmt.Fprint(os.Stderr, "usage: shulker map <mapping.json>\n       shulker map --reverse <mapping.json> <pack> <outdir>\n")
 	}
 	reverse := fs.Bool("reverse", false, "undo a squash: rebuild the original layout")
-	fs.Parse(args)
-	rest := fs.Args()
+	flagArgs, rest := reorderArgs(args, nil)
+	_ = fs.Parse(flagArgs) // ExitOnError handles bad flags
 	if !*reverse {
 		if len(rest) != 1 {
 			fs.Usage()

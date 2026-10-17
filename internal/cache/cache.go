@@ -102,9 +102,9 @@ func (c *Cache) Put(key string, changed bool, data []byte) {
 	if err != nil {
 		return
 	}
-	defer os.Remove(tmp.Name())
+	defer func() { _ = os.Remove(tmp.Name()) }()
 	if _, err := tmp.Write(payload); err != nil {
-		tmp.Close()
+		_ = tmp.Close()
 		return
 	}
 	if err := tmp.Close(); err != nil {

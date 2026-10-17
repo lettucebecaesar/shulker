@@ -265,7 +265,8 @@ func (g *Graph) extractParticle(file string, root jsonx.Value, seen edgeSeen) {
 //
 // These are identifiers/definition names — validation-only in v0.1.
 func (g *Graph) extractAnimationRefs(file string, root jsonx.Value, seen edgeSeen) {
-	jsonx.Walk(root, func(ptr string, v jsonx.Value) error {
+	// The walk callback never returns an error (it only records edges).
+	_ = jsonx.Walk(root, func(ptr string, v jsonx.Value) error {
 		o, ok := jsonx.AsObject(v)
 		if !ok {
 			return nil

@@ -45,7 +45,9 @@ func TestUnwritableDirDegrades(t *testing.T) {
 	// A path that cannot be a directory degrades to a disabled cache,
 	// never an error — cache failures must not fail squashes.
 	bad := filepath.Join(t.TempDir(), "file.txt")
-	os.WriteFile(bad, []byte("x"), 0o644)
+	if err := os.WriteFile(bad, []byte("x"), 0o644); err != nil {
+		t.Fatal(err)
+	}
 	c, err := New(bad, true)
 	if err != nil {
 		t.Fatalf("New with unwritable dir: %v", err)
@@ -57,7 +59,9 @@ func TestUnwritableDirDegrades(t *testing.T) {
 }
 
 func TestKeyIsStableAndDistinct(t *testing.T) {
-	if Key("png", "a") != Key("png", "a") {
+	k1 := Key("png", "a")
+	k2 := Key("png", "a")
+	if k1 != k2 {
 		t.Error("key not stable")
 	}
 	if Key("png", "a") == Key("png", "b") {

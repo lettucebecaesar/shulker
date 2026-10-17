@@ -25,7 +25,7 @@ tidy:
 	go mod tidy
 
 bench:
-	go test ./internal/pipeline -run TestBenchmarkReport -v
+	go test ./internal/pipeline -run TestBenchmarkFixtureReductions -v
 
 clean:
 	rm -f $(BINARY) $(BINARY).exe

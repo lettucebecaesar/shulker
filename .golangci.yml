@@ -4,17 +4,11 @@ run:
   timeout: 5m
 
 linters:
+  # staticcheck, errcheck, govet, ineffassign, unused, ...
   defaults:
-    # staticcheck, errcheck, govet, ineffassign, unused, ...
     use-standard: true
   enable:
     - misspell
-  exclusions:
-    # Long fixture paths and MCBE identifiers read naturally; trust the
-    # domain spelling over the dictionary.
-    - path: _test\.go
-      linters:
-        - dupl
 
 formatters:
   enable:

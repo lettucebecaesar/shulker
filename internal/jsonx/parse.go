@@ -95,10 +95,10 @@ func (p *parser) advance() byte {
 func (p *parser) skipWS() error {
 	for p.pos < len(p.data) {
 		b := p.data[p.pos]
-		switch {
-		case b == ' ' || b == '\t' || b == '\r' || b == '\n':
+		switch b {
+		case ' ', '\t', '\r', '\n':
 			p.advance()
-		case b == '/':
+		case '/':
 			if p.pos+1 >= len(p.data) {
 				return p.errorf("unexpected end of input where a comment was starting")
 			}

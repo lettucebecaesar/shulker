@@ -218,6 +218,42 @@ func TestCLIRegolithZeroArgInvocation(t *testing.T) {
 	}
 }
 
+// Flags work before or after positionals — users type both orders.
+func TestCLIFlagsAfterPositionals(t *testing.T) {
+	bin := buildBinary(t)
+	rich, err := filepath.Abs(filepath.Join("..", "..", "testdata", "packs", "rich"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	tmp := t.TempDir()
+	out := filepath.Join(tmp, "out.mcpack")
+	r := runBin(t, bin, tmp, nil, "squash", rich, out, "--no-rename", "-q")
+	if r.exitCode != 0 {
+		t.Fatalf("flags-after-positionals failed (%d):\n%s\n%s", r.exitCode, r.stdout, r.stderr)
+	}
+	if _, err := os.Stat(out); err != nil {
+		t.Fatalf("output missing: %v", err)
+	}
+	// --no-rename after positionals must actually apply.
+	mapPath := strings.TrimSuffix(out, ".mcpack") + ".map.json"
+	data, err := os.ReadFile(mapPath)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(data), `"renames":[]`) {
+		t.Errorf("--no-rename after positionals was not applied:\n%s", data)
+	}
+	// Value flags still work in both positions.
+	out2 := filepath.Join(tmp, "out2.mcpack")
+	r = runBin(t, bin, tmp, nil, "squash", "--no-rename", rich, out2, "--out-map", filepath.Join(tmp, "custom.map.json"))
+	if r.exitCode != 0 {
+		t.Fatalf("mixed flag order failed (%d):\n%s\n%s", r.exitCode, r.stdout, r.stderr)
+	}
+	if _, err := os.Stat(filepath.Join(tmp, "custom.map.json")); err != nil {
+		t.Errorf("--out-map after positionals not honored: %v", err)
+	}
+}
+
 func TestCLIUnknownCommandExitsUsage(t *testing.T) {
 	bin := buildBinary(t)
 	r := runBin(t, bin, t.TempDir(), nil, "frobnicate")

@@ -87,10 +87,12 @@ func (r *SizeReport) Percent() float64 {
 }
 
 // Render prints the satisfying table: per category, then the total row.
+// Write errors are ignored deliberately — this is display output.
 func (r *SizeReport) Render(w io.Writer) {
-	fmt.Fprintln(w)
-	fmt.Fprintf(w, "  %-14s %10s  %10s  %10s  %7s\n", "category", "before", "after", "saved", "saved %")
-	fmt.Fprintln(w, "  "+strings.Repeat("-", 58))
+	p := func(format string, args ...any) { _, _ = fmt.Fprintf(w, format, args...) }
+	p("\n")
+	p("  %-14s %10s  %10s  %10s  %7s\n", "category", "before", "after", "saved", "saved %")
+	p("  %s\n", strings.Repeat("-", 58))
 	for _, c := range r.Categories {
 		if c.Before == 0 && c.After == 0 {
 			continue
@@ -100,15 +102,15 @@ func (r *SizeReport) Render(w io.Writer) {
 		if c.Before > 0 {
 			pct = float64(saved) * 100 / float64(c.Before)
 		}
-		fmt.Fprintf(w, "  %-14s %10s  %10s  %10s  %6.1f%%\n",
+		p("  %-14s %10s  %10s  %10s  %6.1f%%\n",
 			c.Class.String(), HumanBytes(c.Before), HumanBytes(c.After),
 			HumanBytes(saved), pct)
 	}
-	fmt.Fprintln(w, "  "+strings.Repeat("-", 58))
-	fmt.Fprintf(w, "  %-14s %10s  %10s  %10s  %6.1f%%\n",
+	p("  %s\n", strings.Repeat("-", 58))
+	p("  %-14s %10s  %10s  %10s  %6.1f%%\n",
 		"TOTAL", HumanBytes(r.TotalBefore), HumanBytes(r.TotalAfter),
 		HumanBytes(r.Saved()), r.Percent())
-	fmt.Fprintf(w, "  %d files in, %d files out\n", r.FilesBefore, r.FilesAfter)
+	p("  %d files in, %d files out\n", r.FilesBefore, r.FilesAfter)
 }
 
 // HumanBytes formats byte counts for humans: B, KiB, MiB, GiB.

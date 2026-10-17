@@ -218,7 +218,6 @@ func (r *Result) checkSets(inG, outG *graph.Graph, renameMap map[string]string) 
 	for _, set := range inG.Sets() {
 		newColor, renamed := renameMap[set.Color]
 		if !renamed {
-			newColor = set.Color
 			for _, p := range set.Members() {
 				if _, moved := renameMap[p]; moved {
 					r.add(pack.SeverityError, p,

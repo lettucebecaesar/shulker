@@ -26,7 +26,8 @@ import (
 //     rename).
 func (g *Graph) sweep(file string, root jsonx.Value, seen edgeSeen) {
 	rewriteable := g.byFile[file] != nil && g.byFile[file].Kind == KindUIFile
-	jsonx.Walk(root, func(ptr string, v jsonx.Value) error {
+	// The walk callback never returns an error (it only records edges).
+	_ = jsonx.Walk(root, func(ptr string, v jsonx.Value) error {
 		s, ok := jsonx.AsStringNode(v)
 		if !ok {
 			return nil

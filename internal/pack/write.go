@@ -50,8 +50,12 @@ func (p *Pack) WriteZipFile(path string) error {
 	if err != nil {
 		return err
 	}
-	defer f.Close()
-	return p.WriteZip(f)
+	zerr := p.WriteZip(f)
+	// Close errors matter for data durability; surface the first failure.
+	if cerr := f.Close(); zerr == nil {
+		zerr = cerr
+	}
+	return zerr
 }
 
 func methodFor(f *File) uint16 {

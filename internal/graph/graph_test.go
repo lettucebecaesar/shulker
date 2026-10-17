@@ -63,15 +63,6 @@ func (g *Graph) edgeAt(file, ptr string) *Edge {
 	return nil
 }
 
-func (g *Graph) edgeOnFileContaining(file, raw string) *Edge {
-	for _, e := range g.Edges {
-		if e.File == file && strings.Contains(e.Pointer, "/") && e.Raw == raw {
-			return e
-		}
-	}
-	return nil
-}
-
 func TestAtlasToTextureChain(t *testing.T) {
 	files := minimalPack(t)
 	files["textures/terrain_texture.json"] = `{
