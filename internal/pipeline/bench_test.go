@@ -4,8 +4,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/shulker-tools/shulker/internal/report"
-	"github.com/shulker-tools/shulker/internal/transform"
+	"github.com/lettucebecaesar/shulker/internal/report"
+	"github.com/lettucebecaesar/shulker/internal/transform"
 )
 
 // TestBenchmarkFixtureReductions is the honesty enforcement for the README's

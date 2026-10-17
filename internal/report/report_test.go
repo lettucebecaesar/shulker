@@ -6,10 +6,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/shulker-tools/shulker/internal/graph"
-	"github.com/shulker-tools/shulker/internal/pack"
-	"github.com/shulker-tools/shulker/internal/pipeline"
-	"github.com/shulker-tools/shulker/internal/transform"
+	"github.com/lettucebecaesar/shulker/internal/graph"
+	"github.com/lettucebecaesar/shulker/internal/pack"
+	"github.com/lettucebecaesar/shulker/internal/pipeline"
+	"github.com/lettucebecaesar/shulker/internal/transform"
 )
 
 func loadFixture(t *testing.T, name string) (*pack.Pack, *graph.Graph) {

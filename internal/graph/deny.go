@@ -4,7 +4,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/shulker-tools/shulker/internal/vanilla"
+	"github.com/lettucebecaesar/shulker/internal/vanilla"
 )
 
 // DenyPrefixes are engine-hardcoded subtrees where the engine resolves

@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/shulker-tools/shulker/internal/pack"
+	"github.com/lettucebecaesar/shulker/internal/pack"
 )
 
 // fakeFFmpeg creates a fake ffmpeg executable in dir (cmd on Windows, sh

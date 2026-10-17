@@ -7,9 +7,9 @@ import (
 	"image/png"
 	"testing"
 
-	"github.com/shulker-tools/shulker/internal/graph"
-	"github.com/shulker-tools/shulker/internal/pack"
-	"github.com/shulker-tools/shulker/internal/validate"
+	"github.com/lettucebecaesar/shulker/internal/graph"
+	"github.com/lettucebecaesar/shulker/internal/pack"
+	"github.com/lettucebecaesar/shulker/internal/validate"
 )
 
 // encodeNRGBA is a test helper producing PNG bytes from a function.

@@ -11,12 +11,12 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/shulker-tools/shulker/internal/graph"
-	"github.com/shulker-tools/shulker/internal/pack"
-	"github.com/shulker-tools/shulker/internal/pipeline"
-	"github.com/shulker-tools/shulker/internal/report"
-	"github.com/shulker-tools/shulker/internal/transform"
-	"github.com/shulker-tools/shulker/internal/validate"
+	"github.com/lettucebecaesar/shulker/internal/graph"
+	"github.com/lettucebecaesar/shulker/internal/pack"
+	"github.com/lettucebecaesar/shulker/internal/pipeline"
+	"github.com/lettucebecaesar/shulker/internal/report"
+	"github.com/lettucebecaesar/shulker/internal/transform"
+	"github.com/lettucebecaesar/shulker/internal/validate"
 )
 
 // version is set by the Makefile/CI via -ldflags; dev default for source

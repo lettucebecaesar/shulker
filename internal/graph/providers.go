@@ -3,7 +3,7 @@ package graph
 import (
 	"strings"
 
-	"github.com/shulker-tools/shulker/internal/jsonx"
+	"github.com/lettucebecaesar/shulker/internal/jsonx"
 )
 
 // Providers pass: index identifiers and short names BEFORE edges resolve

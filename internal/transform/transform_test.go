@@ -9,10 +9,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/shulker-tools/shulker/internal/graph"
-	"github.com/shulker-tools/shulker/internal/jsonx"
-	"github.com/shulker-tools/shulker/internal/pack"
-	"github.com/shulker-tools/shulker/internal/validate"
+	"github.com/lettucebecaesar/shulker/internal/graph"
+	"github.com/lettucebecaesar/shulker/internal/jsonx"
+	"github.com/lettucebecaesar/shulker/internal/pack"
+	"github.com/lettucebecaesar/shulker/internal/validate"
 )
 
 func fixture(t *testing.T, name string) (*pack.Pack, map[string]jsonx.Value, *graph.Graph) {

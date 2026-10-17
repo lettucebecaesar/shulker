@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/shulker-tools/shulker/internal/jsonx"
+	"github.com/lettucebecaesar/shulker/internal/jsonx"
 )
 
 // uuidPattern is the canonical 8-4-4-4-12 hex form. We accept any UUID

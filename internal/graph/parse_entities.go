@@ -3,7 +3,7 @@ package graph
 import (
 	"strings"
 
-	"github.com/shulker-tools/shulker/internal/jsonx"
+	"github.com/lettucebecaesar/shulker/internal/jsonx"
 )
 
 // extractClientEntity walks entity/*.entity.json and attachables/*.json.

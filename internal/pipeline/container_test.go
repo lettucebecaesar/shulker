@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/shulker-tools/shulker/internal/pack"
-	"github.com/shulker-tools/shulker/internal/transform"
+	"github.com/lettucebecaesar/shulker/internal/pack"
+	"github.com/lettucebecaesar/shulker/internal/transform"
 )
 
 // richEntrySet reads the golden fixture into path->bytes with a prefix.

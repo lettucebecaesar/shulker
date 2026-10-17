@@ -6,9 +6,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/shulker-tools/shulker/internal/graph"
-	"github.com/shulker-tools/shulker/internal/jsonx"
-	"github.com/shulker-tools/shulker/internal/pack"
+	"github.com/lettucebecaesar/shulker/internal/graph"
+	"github.com/lettucebecaesar/shulker/internal/jsonx"
+	"github.com/lettucebecaesar/shulker/internal/pack"
 )
 
 func fixturePath(name string) string {

@@ -1,3 +1,3 @@
-module github.com/shulker-tools/shulker
+module github.com/lettucebecaesar/shulker
 
 go 1.22

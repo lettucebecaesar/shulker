@@ -20,8 +20,8 @@ import (
 	"fmt"
 	"sort"
 
-	"github.com/shulker-tools/shulker/internal/jsonx"
-	"github.com/shulker-tools/shulker/internal/pack"
+	"github.com/lettucebecaesar/shulker/internal/jsonx"
+	"github.com/lettucebecaesar/shulker/internal/pack"
 )
 
 // EdgeKind says what a reference string means. Kinds that target files

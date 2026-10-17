@@ -1,8 +1,8 @@
 package graph
 
 import (
-	"github.com/shulker-tools/shulker/internal/jsonx"
-	"github.com/shulker-tools/shulker/internal/pack"
+	"github.com/lettucebecaesar/shulker/internal/jsonx"
+	"github.com/lettucebecaesar/shulker/internal/pack"
 )
 
 // ParseAll parses every JSON file in the pack (except the manifest, which is

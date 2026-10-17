@@ -4,9 +4,9 @@ import (
 	"path"
 	"strings"
 
-	"github.com/shulker-tools/shulker/internal/jsonx"
-	"github.com/shulker-tools/shulker/internal/molang"
-	"github.com/shulker-tools/shulker/internal/pack"
+	"github.com/lettucebecaesar/shulker/internal/jsonx"
+	"github.com/lettucebecaesar/shulker/internal/molang"
+	"github.com/lettucebecaesar/shulker/internal/pack"
 )
 
 // sweep is the conservative backstop of the whole design.

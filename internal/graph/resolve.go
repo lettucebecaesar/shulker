@@ -4,7 +4,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/shulker-tools/shulker/internal/pack"
+	"github.com/lettucebecaesar/shulker/internal/pack"
 )
 
 // resolveTexture maps a texture reference string to a pack file.

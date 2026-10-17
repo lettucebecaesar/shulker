@@ -51,8 +51,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/shulker-tools/shulker/internal/graph"
-	"github.com/shulker-tools/shulker/internal/pack"
+	"github.com/lettucebecaesar/shulker/internal/graph"
+	"github.com/lettucebecaesar/shulker/internal/pack"
 )
 
 // repoMetadata is excluded from the frozen list: it ships in the mirror

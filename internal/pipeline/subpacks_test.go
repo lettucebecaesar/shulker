@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/shulker-tools/shulker/internal/transform"
+	"github.com/lettucebecaesar/shulker/internal/transform"
 )
 
 // The subpack member of the rich fixture is a complete mini-pack: its own

@@ -1,7 +1,7 @@
 package graph
 
 import (
-	"github.com/shulker-tools/shulker/internal/jsonx"
+	"github.com/lettucebecaesar/shulker/internal/jsonx"
 )
 
 // edgeSeen returns true when a pointer already has an edge (dedup between

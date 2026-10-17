@@ -14,8 +14,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/shulker-tools/shulker/internal/graph"
-	"github.com/shulker-tools/shulker/internal/pack"
+	"github.com/lettucebecaesar/shulker/internal/graph"
+	"github.com/lettucebecaesar/shulker/internal/pack"
 )
 
 // Plan is the rename plan: which files move where, and (for reporting) why

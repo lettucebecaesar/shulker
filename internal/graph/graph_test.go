@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/shulker-tools/shulker/internal/pack"
+	"github.com/lettucebecaesar/shulker/internal/pack"
 )
 
 func buildGraph(t *testing.T, files map[string]string) (*Graph, *pack.Pack) {

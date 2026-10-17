@@ -4,7 +4,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/shulker-tools/shulker/internal/pack"
+	"github.com/lettucebecaesar/shulker/internal/pack"
 )
 
 // PBR companion suffixes, verified against current vanilla
