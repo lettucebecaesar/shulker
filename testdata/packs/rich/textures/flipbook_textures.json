@@ -1,0 +1,8 @@
+[
+	{
+		"flipbook_texture": "textures/custom/flip",
+		"atlas_tile": "flip_strip",
+		"ticks_per_frame": 2,
+		"frames": [0, 1, 2, 3]
+	}
+]

@@ -1,0 +1,18 @@
+{
+	"format_version": "1.10.0",
+	"minecraft:client_entity": {
+		"description": {
+			"identifier": "shulker:hat",
+			"materials": {
+				"default": "entity_alphatest"
+			},
+			"textures": {
+				"default": "textures/custom/mob"
+			},
+			"geometry": {
+				"default": "geometry.shulker_mob"
+			},
+			"render_controllers": ["controller.render.shulker_mob"]
+		}
+	}
+}

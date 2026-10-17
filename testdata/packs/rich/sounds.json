@@ -1,0 +1,17 @@
+{
+	"shulker.pop_event": {
+		"category": "neutral",
+		"sounds": [
+			{
+				"name": "shulker.pop",
+				"volume": 1.0
+			}
+		]
+	},
+	"shulker.inline_path_event": {
+		"sounds": ["sounds/custom/pop"]
+	},
+	"shulker.vanilla_event": {
+		"sounds": ["mob.pig.say"]
+	}
+}

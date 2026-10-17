@@ -1,0 +1,9 @@
+﻿{
+	"resource_pack_name": "shulker_fixture",
+	"texture_name": "atlas.item",
+	"texture_data": {
+		"shulker.item": {
+			"textures": "textures/custom/item",
+		},
+	}
+}

@@ -1,0 +1,12 @@
+{
+	"materials": {
+		"version": "1.12.0",
+		"materials": [
+			{
+				"name": "entity_alphatest",
+				"parent": "entity_base",
+				"+states": ["Blending", "DisableCulling"]
+			}
+		]
+	}
+}

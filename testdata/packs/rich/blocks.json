@@ -1,0 +1,36 @@
+{
+	"shulker:custom_block": {
+		"sound": "stone",
+		"textures": "shulker.custom_block"
+	},
+	"shulker:pbr_block": {
+		"sound": "stone",
+		"textures": "shulker.pbr_block"
+	},
+	"shulker:texset_block": {
+		"sound": "stone",
+		"textures": "shulker.texset_block"
+	},
+	"shulker:animated_block": {
+		"sound": "stone",
+		"textures": "flip_strip"
+	},
+	"shulker:vintage_block": {
+		"carried_textures": "shulker.multi",
+		"sound": "stone",
+		"textures": {
+			"down": "shulker.tinted",
+			"side": "shulker.custom_block",
+			"up": "shulker.pbr_block"
+		},
+		"ambient_occlusion_exponent": 0.80,
+		"isotropic": {
+			"down": true,
+			"up": true
+		}
+	},
+	"shulker:vanilla_stone_block": {
+		"sound": "stone",
+		"textures": "stone"
+	}
+}

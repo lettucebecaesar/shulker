@@ -1,0 +1,44 @@
+{
+	"format_version": "1.10.0",
+	"minecraft:client_entity": {
+		"description": {
+			"identifier": "shulker:mob",
+			"min_engine_version": "1.10.0",
+			"materials": {
+				"default": "entity_alphatest"
+			},
+			"textures": {
+				"default": "textures/custom/mob",
+				"sad": "textures/custom/mob_sad"
+			},
+			"geometry": {
+				"default": "geometry.shulker_mob",
+				"legacy": "geometry.legacy_mob"
+			},
+			"animations": {
+				"walk": "animation.shulker_mob.walk"
+			},
+			"scripts": {
+				"animate": ["walk"],
+				"pre_animation": [
+					"v.mood = query.health / query.max_health;"
+				],
+				"scale": "query.is_baby ? 0.5 : 1.0"
+			},
+			"particle_effects": {
+				"burst": "shulker:burst"
+			},
+			"render_controllers": [
+				"controller.render.shulker_mob",
+				{
+					"controller.render.biped": "query.is_saddled"
+				}
+			],
+			"spawn_egg": {
+				"texture": "shulker.item",
+				"base_color": "#123456",
+				"overlay_color": "#654321"
+			}
+		}
+	}
+}

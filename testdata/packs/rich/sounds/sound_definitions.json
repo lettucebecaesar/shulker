@@ -1,0 +1,21 @@
+{
+	"format_version": "1.14.0",
+	"sound_definitions": {
+		"shulker.pop": {
+			"category": "neutral",
+			"max_distance": null,
+			"min_distance": null,
+			// The float-noise case straight out of vanilla: a 32-bit float
+			// serialized as a 64-bit double. Normalization must shorten it
+			// to 0.07 without changing the value the engine reads.
+			"sounds": [
+				{
+					"name": "sounds/custom/pop",
+					"volume": 0.07000000000000001,
+					"pitch": 1.10
+				}
+			],
+			"subtitle": "subtitles.shulker.pop"
+		}
+	}
+}

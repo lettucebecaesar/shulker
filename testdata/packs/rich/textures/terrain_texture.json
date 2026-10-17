@@ -1,0 +1,48 @@
+// Terrain atlas. Written deliberately noisy: comments, trailing commas, and
+// a hand-formatted layout — minify must strip all of it without touching a
+// single key, value, or their order.
+{
+	"resource_pack_name": "shulker_fixture",
+	"texture_name": "atlas.terrain",
+	"padding": 8,
+	"num_mip_levels": 4,
+	"texture_data": {
+		// PBR set 1: full suffix trio, referenced here only.
+		"shulker.custom_block": {
+			"textures": "textures/custom/block",
+		},
+		// PBR set 2: mixed extension companions (mers companion is .tga,
+		// like current vanilla Vibrant Visuals content).
+		"shulker.pbr_block": {
+			"textures": "textures/custom/pbr",
+		},
+		// This texture is also referenced by a *.texture_set.json file,
+		// which pairs with its textures by name+directory: it must NOT be
+		// renamed in v0.1 even though it has this rewriteable atlas edge.
+		"shulker.texset_block": {
+			"textures": "textures/custom/texset_ref",
+		},
+		// Vanilla-override case: this redefines the vanilla "stone" short
+		// name to a pack file at a vanilla path. The deny-list must keep
+		// this file exactly where it is.
+		"stone": {
+			"textures": "textures/blocks/stone",
+		},
+		// Multi-variant array shape from vanilla (grass_top style).
+		"shulker.multi": {
+			"textures": [
+				"textures/custom/mob",
+				"textures/custom/mob_sad",
+			],
+		},
+		// Tinted object shape from vanilla (grass_side style).
+		"shulker.tinted": {
+			"textures": [
+				{
+					"path": "textures/custom/block",
+					"overlay_color": "#79c05a",
+				},
+			],
+		},
+	},
+}

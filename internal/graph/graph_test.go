@@ -230,7 +230,10 @@ func TestClientEntityGraph(t *testing.T) {
 	g, _ := buildGraph(t, files)
 
 	// Texture map edges.
-	for _, ptr := range []string{"/description/textures/default", "/description/textures/sad"} {
+	for _, ptr := range []string{
+		"/minecraft:client_entity/description/textures/default",
+		"/minecraft:client_entity/description/textures/sad",
+	} {
 		e := g.edgeAt("entity/mob.entity.json", ptr)
 		if e == nil || e.Target == "" || !e.Rewriteable {
 			t.Fatalf("entity texture edge wrong at %s: %+v", ptr, e)
@@ -242,15 +245,15 @@ func TestClientEntityGraph(t *testing.T) {
 		kind   EdgeKind
 		target string
 	}{
-		{"/description/geometry/default", KindGeometryID, "models/entity/mob.geo.json"},
-		{"/description/animations/walk", KindAnimationID, "animations/mob.animation.json"},
-		{"/description/particle_effects/burst", KindParticleID, "particles/burst.json"},
-		{"/description/render_controllers/0", KindRenderControllerID, "render_controllers/mob.render_controllers.json"},
+		{"/minecraft:client_entity/description/geometry/default", KindGeometryID, "models/entity/mob.geo.json"},
+		{"/minecraft:client_entity/description/animations/walk", KindAnimationID, "animations/mob.animation.json"},
+		{"/minecraft:client_entity/description/particle_effects/burst", KindParticleID, "particles/burst.json"},
+		{"/minecraft:client_entity/description/render_controllers/0", KindRenderControllerID, "render_controllers/mob.render_controllers.json"},
 		// Object form {"controller.render.biped": "query.is_saddled"} — a
 		// vanilla-only controller: identifier edge exists, target dangles
 		// (resolves against vanilla at runtime), value is sacred molang.
-		{"/description/render_controllers/1", KindRenderControllerID, ""},
-		{"/description/spawn_egg/texture", KindAtlasShortName, "textures/item_texture.json"},
+		{"/minecraft:client_entity/description/render_controllers/1", KindRenderControllerID, ""},
+		{"/minecraft:client_entity/description/spawn_egg/texture", KindAtlasShortName, "textures/item_texture.json"},
 	}
 	for _, tc := range idCases {
 		e := g.edgeAt("entity/mob.entity.json", tc.ptr)
@@ -284,14 +287,14 @@ func TestClientEntityGraph(t *testing.T) {
 	}
 
 	// Attachable texture edge.
-	if e := g.edgeAt("attachables/hat.json", "/description/textures/default"); e == nil || e.Target != "textures/custom/mob.png" {
+	if e := g.edgeAt("attachables/hat.json", "/minecraft:client_entity/description/textures/default"); e == nil || e.Target != "textures/custom/mob.png" {
 		t.Fatalf("attachable edge wrong: %+v", e)
 	}
 
 	// The molang script must never produce an edge (it contains '(' and
 	// query.* markers; a sweep would skip it as sacred).
 	for _, e := range g.Edges {
-		if e.File == "entity/mob.entity.json" && strings.HasPrefix(e.Pointer, "/description/scripts") {
+		if e.File == "entity/mob.entity.json" && strings.Contains(e.Pointer, "/scripts") {
 			t.Errorf("molang leaked into graph: %+v", e)
 		}
 	}
@@ -313,7 +316,7 @@ func TestLegacyAndModernGeometry(t *testing.T) {
 	if got, ok := g.resolveIdentifier("geometry.modern_mob", g.geometryIndex); !ok || got != "models/entity/modern.geo.json" {
 		t.Errorf("modern geometry resolve = %q %v", got, ok)
 	}
-	e := g.edgeAt("entity/a.entity.json", "/description/geometry/legacy")
+	e := g.edgeAt("entity/a.entity.json", "/minecraft:client_entity/description/geometry/legacy")
 	if e == nil || e.Target != "models/entity/legacy.geo.json" {
 		t.Fatalf("legacy geometry edge: %+v", e)
 	}

@@ -1,0 +1,21 @@
+[
+	"textures/custom/block.png",
+	"textures/custom/block_mer.png",
+	"textures/custom/block_normal.png",
+	"textures/custom/block_heightmap.png",
+	"textures/custom/pbr.png",
+	"textures/custom/pbr_mer.png",
+	"textures/custom/pbr_normal.png",
+	"textures/custom/pbr_mers.tga",
+	"textures/custom/texset_ref.png",
+	"textures/custom/texset_ref_mer.png",
+	"textures/custom/flip.png",
+	"textures/custom/item.png",
+	"textures/custom/mob.png",
+	"textures/custom/mob_sad.png",
+	"textures/custom/ui_panel.png",
+	"textures/custom/ui_free.png",
+	"textures/custom/particles.png",
+	"textures/blocks/stone.png",
+	"textures/environment/moon.png"
+]

@@ -1,0 +1,5 @@
+## Fixture pack strings. '##' lines are comments; the engine ignores them.
+## Lang keys are sacred: shulker never touches this file's content.
+item.shulker_fixture.custom_block.name=Custom Block
+tile.shulker_fixture:custom_block.name=Custom Block
+shulker_fixture.hello=Hello from shulker!

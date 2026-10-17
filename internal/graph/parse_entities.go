@@ -30,10 +30,12 @@ func (g *Graph) extractClientEntity(file string, root jsonx.Value, seen edgeSeen
 		return
 	}
 	var desc *jsonx.Object
+	descPrefix := ""
 	if ceV, ok := obj.Get("minecraft:client_entity"); ok {
 		if ce, isObj := jsonx.AsObject(ceV); isObj {
 			if dV, ok := ce.Get("description"); ok {
 				desc, _ = jsonx.AsObject(dV)
+				descPrefix = "/minecraft:client_entity/description"
 			}
 		}
 	}
@@ -42,6 +44,7 @@ func (g *Graph) extractClientEntity(file string, root jsonx.Value, seen edgeSeen
 		// generators do).
 		if dV, ok := obj.Get("description"); ok {
 			desc, _ = jsonx.AsObject(dV)
+			descPrefix = "/description"
 		}
 	}
 	if desc == nil {
@@ -50,7 +53,7 @@ func (g *Graph) extractClientEntity(file string, root jsonx.Value, seen edgeSeen
 
 	for i := range desc.Members {
 		m := &desc.Members[i]
-		ptr := "/description/" + esc(m.Key)
+		ptr := descPrefix + "/" + esc(m.Key)
 		switch m.Key {
 		case "textures":
 			if o, ok := jsonx.AsObject(m.Val); ok {

@@ -1,0 +1,4 @@
+{
+	"background": "textures/custom/ui_panel",
+	"note": "This file's schema is unknown to shulker. Any pack asset it references is therefore locked: an unmodeled reference is a reference we cannot promise to rewrite, and invariant 3 says 100% of inbound references get rewritten or there is no rename."
+}

@@ -1,0 +1,14 @@
+{
+	"format_version": "1.10.0",
+	"minecraft:client_entity": {
+		"description": {
+			"identifier": "shulker:broken",
+			"textures": {
+				"default": "textures/missing/nope"
+			},
+			"geometry": {
+				"default": "geometry.does_not_exist"
+			}
+		}
+	}
+}

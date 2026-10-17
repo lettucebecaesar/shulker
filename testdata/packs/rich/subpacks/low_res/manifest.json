@@ -1,0 +1,18 @@
+{
+	"format_version": 2,
+	"header": {
+		"name": "Shulker Fixture Subpack",
+		"description": "Must survive squashing byte-for-byte",
+		"uuid": "8e2f6fc4-0cb8-46f7-b69d-2ab3f0d9c741",
+		"version": [1, 0, 0],
+		"min_engine_version": [1, 21, 0]
+	},
+	"modules": [
+		{
+			"description": "resources",
+			"type": "resources",
+			"uuid": "b8e5a89b-6307-45bc-b1f7-5d64ec1a1d18",
+			"version": [1, 0, 0]
+		}
+	]
+}

@@ -155,6 +155,10 @@ type FileFacts struct {
 	Provides *Provides
 }
 
+// ShortNameIndex exposes the atlas short-name -> provider files index
+// (sorted) so validation can flag cross-registry collisions.
+func (g *Graph) ShortNameIndex() map[string][]string { return g.shortNameIndex }
+
 // Inbound returns every edge targeting the given pack file.
 func (g *Graph) Inbound(target string) []*Edge { return g.byTarget[target] }
 

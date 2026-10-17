@@ -1,0 +1,35 @@
+// json-ui screens in the wild come generously commented with trailing
+// commas everywhere. The engine's parser accepts both; so must we.
+{
+	"namespace": "shulker_fixture",
+	"shulker_panel": {
+		"type": "panel",
+		"controls": [
+			{
+				"type": "image",
+				// Blocked texture: data/palette.json (unknown schema) also
+				// references it, so it must keep its path.
+				"texture": "textures/custom/ui_panel",
+				"size": [16, 16],
+			},
+			{
+				"type": "image",
+				// Free texture: only this file references it, so the rename
+				// transform may rewrite this very string.
+				"texture": "textures/custom/ui_free",
+				"size": [16, 16],
+			},
+			{
+				// A vanilla texture: never resolves inside this pack, must
+				// be left completely alone.
+				"type": "image",
+				"texture": "textures/ui/vanilla_thing",
+			},
+			{
+				"$panel_bg": "textures/custom/ui_panel",
+				"type": "label",
+				"text": "shulker_fixture.hello",
+			},
+		],
+	},
+}

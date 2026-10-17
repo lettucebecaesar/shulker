@@ -1,0 +1,26 @@
+{
+	"format_version": "1.10.0",
+	"animation_controllers": {
+		"controller.animation.shulker_mob": {
+			"initial_state": "default",
+			"states": {
+				"default": {
+					"animations": ["walk"],
+					"transitions": [
+						{
+							"sad": "query.is_saddled"
+						}
+					]
+				},
+				"sad": {
+					"animations": ["walk"],
+					"transitions": [
+						{
+							"default": "!query.is_saddled"
+						}
+					]
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,28 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"animation.shulker_mob.walk": {
+			"loop": true,
+			"animation_length": 1.5,
+			"bones": {
+				"body": {
+					"rotation": [0, "math.sin(query.anim_time * 90) * 10", 0]
+				}
+			},
+			"timeline": {
+				"0.0": {
+					"sound_effects": [
+						{
+							"effect": "shulker.pop"
+						}
+					],
+					"particle_effects": [
+						{
+							"effect": "shulker:burst"
+						}
+					]
+				}
+			}
+		}
+	}
+}

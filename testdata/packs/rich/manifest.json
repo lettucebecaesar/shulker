@@ -1,0 +1,21 @@
+{
+	"format_version": 2,
+	"header": {
+		"name": "Shulker Rich Fixture",
+		"description": "Golden fixture covering every v0.1 file type",
+		"uuid": "66c6e9a8-3093-462a-9c36-dbb052165822",
+		"version": [1, 0, 0],
+		"min_engine_version": [1, 21, 0]
+	},
+	"modules": [
+		{
+			"description": "resources",
+			"type": "resources",
+			"uuid": "743f6949-53be-44b6-b326-398005028819",
+			"version": [1, 0, 0]
+		}
+	],
+	"capabilities": [
+		"pbr"
+	]
+}
