@@ -4,10 +4,14 @@ run:
   timeout: 5m
 
 linters:
-  # staticcheck, errcheck, govet, ineffassign, unused, ...
-  defaults:
-    use-standard: true
+  # The v2.14 "defaults: use-standard" key was removed in v2.15; enable the
+  # standard set explicitly so the config validates on both.
   enable:
+    - errcheck
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
     - misspell
 
 formatters:
