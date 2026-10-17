@@ -1,6 +1,7 @@
 package pack
 
 import (
+	"fmt"
 	"path"
 	"strings"
 )
@@ -97,28 +98,26 @@ type PathError struct {
 }
 
 func (e *PathError) Error() string {
-	return "bad pack path " + strconv(e.Raw) + ": " + e.Reason
+	return fmt.Sprintf("bad pack path %q: %s", e.Raw, e.Reason)
 }
-
-func strconv(s string) string { return `"` + s + `"` }
 
 // FixedPaths are registry files the engine looks up by exact path. They can
 // be minified but never renamed. Anything not on this list that the engine
 // also fixates on (ui/*.json, font glyph sheets) is handled by the rename
 // deny-list in the graph package instead.
 var FixedPaths = map[string]bool{
-	"manifest.json":                     true,
-	"blocks.json":                       true,
-	"sounds.json":                       true,
-	"biomes_client.json":                true,
-	"textures/terrain_texture.json":     true,
-	"textures/item_texture.json":        true,
-	"textures/flipbook_textures.json":   true,
-	"sounds/sound_definitions.json":     true,
-	"textures_list.json":                true,
-	"texture_list.json":                true, // marketplace misspelling variant
-	"texts/languages.json":              true,
-	"materials/materials.json":          true,
+	"manifest.json":                   true,
+	"blocks.json":                     true,
+	"sounds.json":                     true,
+	"biomes_client.json":              true,
+	"textures/terrain_texture.json":   true,
+	"textures/item_texture.json":      true,
+	"textures/flipbook_textures.json": true,
+	"sounds/sound_definitions.json":   true,
+	"textures_list.json":              true,
+	"texture_list.json":               true, // marketplace misspelling variant
+	"texts/languages.json":            true,
+	"materials/materials.json":        true,
 }
 
 // IsFixedPath reports whether the engine resolves this path directly.

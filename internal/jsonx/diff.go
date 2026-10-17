@@ -14,7 +14,7 @@ type StringChange struct {
 //   - AllowNumberNormalization treats two literals as equal when they parse
 //     to the same float32 (minify's provably-safe float shortening).
 type DiffOptions struct {
-	AllowStringChanges     map[string]StringChange
+	AllowStringChanges       map[string]StringChange
 	AllowNumberNormalization bool
 }
 

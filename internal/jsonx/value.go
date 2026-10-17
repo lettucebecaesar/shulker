@@ -68,10 +68,10 @@ type Null struct{}
 
 func (*Object) isValue() {}
 func (*Array) isValue()  {}
-func (*String) isValue()  {}
-func (*Number) isValue()  {}
-func (Bool) isValue()     {}
-func (Null) isValue()     {}
+func (*String) isValue() {}
+func (*Number) isValue() {}
+func (Bool) isValue()    {}
+func (Null) isValue()    {}
 
 // Get returns the value of the first member with the given decoded key.
 func (o *Object) Get(key string) (Value, bool) {

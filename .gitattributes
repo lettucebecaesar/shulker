@@ -1,0 +1,11 @@
+# Deterministic builds need deterministic bytes: keep text files LF in the
+# working tree on every platform, and never touch binary fixtures.
+* text=auto eol=lf
+*.png binary
+*.jpg binary
+*.tga binary
+*.ogg binary
+*.wav binary
+*.webp binary
+*.zip binary
+*.mcpack binary

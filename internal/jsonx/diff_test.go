@@ -151,8 +151,8 @@ func TestDiffCatchesKeyReorder(t *testing.T) {
 
 func TestDiffCatchesShapeChanges(t *testing.T) {
 	cases := []struct {
-		name     string
-		in, out  string
+		name    string
+		in, out string
 	}{
 		{"type change", `{"a": 1}`, `{"a": "1"}`},
 		{"member added", `{"a": 1}`, `{"a": 1, "b": 2}`},
