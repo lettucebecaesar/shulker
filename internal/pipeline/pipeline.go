@@ -26,6 +26,9 @@ type Options struct {
 	// (~/.cache/shulker, or CacheDir when set).
 	UseCache bool
 	CacheDir string
+	// SquashSubpacks recursively squashes each subpacks/<dir> member with
+	// the same rigor as the parent (its own full pipeline + validation).
+	SquashSubpacks bool
 	// Generator labels mapping/report outputs.
 	Generator string
 }
@@ -121,6 +124,17 @@ func SquashPack(p *pack.Pack, opts Options) (*Result, error) {
 	}
 	res.Transform = tres
 
+	// 2b. Recursive subpack squash: each subpacks/<dir> containing a
+	// manifest is a full nested pack. It runs its OWN complete pipeline —
+	// including its own post-transform validation — and its logs are
+	// merged into the parent's with the subpack prefix, so the mapping,
+	// report, and parent-level accounting stay one story.
+	if opts.SquashSubpacks {
+		if err := squashSubpacks(p, tres, opts); err != nil {
+			return nil, err
+		}
+	}
+
 	// 3. Re-load the result as a real pack — classification, ordering, and
 	// manifest validation run again on exactly what will ship.
 	out, err := pack.FromFiles("squashed", tres.Files)
@@ -138,9 +152,12 @@ func SquashPack(p *pack.Pack, opts Options) (*Result, error) {
 		return nil, err
 	}
 	res.Post = validate.PostTransform(p, gIn, out, outG, &validate.TransformLog{
-		Renames:      tres.Renames,
-		Rewrites:     tres.Rewrites,
-		PNGOptimized: tres.PNGOptimized,
+		Renames:            tres.Renames,
+		Rewrites:           tres.Rewrites,
+		PNGOptimized:       tres.PNGOptimized,
+		AudioTranscoded:    tres.AudioTranscoded,
+		OverridesOptimized: tres.OverridesOptimized,
+		SubpacksSquashed:   opts.SquashSubpacks,
 	})
 	if res.Post.HasErrors() {
 		return nil, fmt.Errorf("post-transform validation FAILED — this is a shulker bug, please report it:\n%s",

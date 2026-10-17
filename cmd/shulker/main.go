@@ -50,6 +50,10 @@ Squash flags:
   --png-optimize-overrides  re-encode override textures (vanilla paths,
                          unreferenced, blocked) with pixel-verified lossless
                          encoding; paths and pixels stay, bytes shrink
+  --audio-ffmpeg          re-encode pack-internal OGG audio through ffmpeg
+                         (opt-in, keep-if-smaller; --audio-quality N)
+  --squash-subpacks       recursively squash subpacks/<dir> members with
+                         the same rigor (each runs its own validation)
   --workers N           parallel PNG workers (default 8)
   --out-map FILE         mapping file to write (default <out>.map.json)
   --report FILE          machine-readable JSON report
@@ -180,6 +184,7 @@ func cmdSquash(args []string) {
 	pngOverrides := fs.Bool("png-optimize-overrides", false, "re-encode override textures (vanilla paths etc.) with pixel-verified lossless encoding")
 	audioFFmpeg := fs.Bool("audio-ffmpeg", false, "re-encode pack-internal OGG audio through ffmpeg (opt-in, keep-if-smaller; requires ffmpeg)")
 	audioQuality := fs.Int("audio-quality", 4, "Vorbis quality for --audio-ffmpeg (-qscale:a, 0..10)")
+	squashSubpacks := fs.Bool("squash-subpacks", false, "recursively squash subpacks/<dir> members with the same rigor")
 	noCache := fs.Bool("no-cache", false, "disable the transform cache")
 	workers := fs.Int("workers", 8, "parallel PNG workers")
 	quiet := fs.Bool("q", false, "quiet")
@@ -216,6 +221,7 @@ func cmdSquash(args []string) {
 	opts.Transforms.PNGOptimizeOverrides = *pngOverrides
 	opts.Transforms.AudioFFmpeg = *audioFFmpeg
 	opts.Transforms.AudioQuality = *audioQuality
+	opts.SquashSubpacks = *squashSubpacks
 	opts.Transforms.Workers = *workers
 	opts.UseCache = !*noCache
 

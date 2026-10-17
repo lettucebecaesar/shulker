@@ -318,8 +318,8 @@ func assemble(files []*File, source string, warnings []Finding) (*Pack, error) {
 		p.Warnings = append(p.Warnings, Finding{
 			Severity: SeverityWarning,
 			Path:     "subpacks/",
-			Msg: "subpacks detected; shulker v0.1 leaves subpacks completely untouched — " +
-				"squash the subpacks yourself before shipping if you want them optimized",
+			Msg: "subpacks detected; they are left completely untouched by default — " +
+				"pass --squash-subpacks to squash each subpack with the same rigor",
 		})
 	}
 	return p, nil

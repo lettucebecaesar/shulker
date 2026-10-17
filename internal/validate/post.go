@@ -27,6 +27,11 @@ type TransformLog struct {
 	// explicit --audio-ffmpeg opt-in (original paths). Without that flag,
 	// all audio must stay byte-identical.
 	AudioTranscoded map[string]bool
+	// SubpacksSquashed records that the transform ran the recursive
+	// --squash-subpacks pass: subpack JSON was minified and subpack files
+	// may have been renamed inside their subpack. Without it, every byte
+	// under subpacks/ must be identical to the input.
+	SubpacksSquashed bool
 }
 
 // PostTransform proves the output pack is load-equivalent to the input:
@@ -129,6 +134,12 @@ func (r *Result) checkBytes(in, out *pack.Pack, renameMap map[string]string, log
 			continue
 		}
 		if log.PNGOptimized[f.Path] || log.AudioTranscoded[f.Path] {
+			continue
+		}
+		if f.Class == pack.ClassSubpack && log.SubpacksSquashed {
+			// The recursive pass replaced subpack content; each subpack
+			// ran its own full pipeline + PostTransform inside the
+			// transform. The parent only checks inventory accounting.
 			continue
 		}
 		of, ok := out.File(to)
@@ -275,6 +286,18 @@ func (r *Result) checkProtected(in *pack.Pack, log *TransformLog) {
 		if rn.From == "manifest.json" || rn.From == "pack_icon.png" {
 			r.add(pack.SeverityError, rn.From, "sacred file was renamed")
 		}
+		// Subpack-internal renames under the --squash-subpacks opt-in are
+		// sanctioned by their own member-level PostTransform (which
+		// enforced NeverRename/deny/vanilla rules on the member-relative
+		// paths). The parent only verifies they stay inside their subpack.
+		if log.SubpacksSquashed && strings.HasPrefix(rn.From, "subpacks/") {
+			subpackRoot := subpackRootOf(rn.From)
+			if subpackRoot != subpackRootOf(rn.To) {
+				r.add(pack.SeverityError, rn.From,
+					"subpack rename escaped its subpack (to %s)", rn.To)
+			}
+			continue
+		}
 		if graph.NeverRename(rn.From) {
 			r.add(pack.SeverityError, rn.From, "engine-fixed or deny-listed path was renamed")
 		}
@@ -303,6 +326,19 @@ func (r *Result) checkProtected(in *pack.Pack, log *TransformLog) {
 				"vanilla-override texture was re-encoded (must stay byte-identical; use --png-optimize-overrides to opt in)")
 		}
 	}
+}
+
+// subpackRootOf returns the subpacks/<name> root of a path inside a
+// subpack, or "" when the path is not in one.
+func subpackRootOf(p string) string {
+	if !strings.HasPrefix(p, "subpacks/") {
+		return ""
+	}
+	rest := strings.TrimPrefix(p, "subpacks/")
+	if i := strings.IndexByte(rest, '/'); i >= 0 {
+		return "subpacks/" + rest[:i]
+	}
+	return ""
 }
 
 func bytesEqual(a, b []byte) bool {

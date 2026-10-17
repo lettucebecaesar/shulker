@@ -1,0 +1,8 @@
+{
+	// A subpack is a full nested pack: its own manifest, its own atlas.
+	"resource_pack_name": "shulker_fixture_low",
+	"texture_name": "atlas.terrain",
+	"texture_data": {
+		"low.item": {"textures": "textures/custom/item"},
+	},
+}

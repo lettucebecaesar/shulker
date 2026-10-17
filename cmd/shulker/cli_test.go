@@ -445,6 +445,43 @@ func TestCLIContainerSquashAndCheck(t *testing.T) {
 	}
 }
 
+// --squash-subpacks gives the fixture's subpack the full treatment through
+// the compiled binary, and the default squash leaves it byte-identical.
+func TestCLISquashSubpacks(t *testing.T) {
+	bin := buildBinary(t)
+	rich, err := filepath.Abs(filepath.Join("..", "..", "testdata", "packs", "rich"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	tmp := t.TempDir()
+	out := filepath.Join(tmp, "s.mcpack")
+	r := runBin(t, bin, tmp, nil, "squash", rich, out, "--squash-subpacks", "-q")
+	if r.exitCode != 0 {
+		t.Fatalf("--squash-subpacks failed (%d):\n%s\n%s", r.exitCode, r.stdout, r.stderr)
+	}
+	mapData, err := os.ReadFile(strings.TrimSuffix(out, ".mcpack") + ".map.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(mapData), "subpacks/low_res/textures/_") {
+		t.Errorf("mapping missing prefixed subpack rename:\n%s", mapData)
+	}
+	// The squashed pack re-validates.
+	r = runBin(t, bin, tmp, nil, "check", out)
+	if r.exitCode != 0 {
+		t.Errorf("check on subpack-squashed pack failed:\n%s\n%s", r.stdout, r.stderr)
+	}
+	// Default: the loader's hint mentions the flag.
+	r = runBin(t, bin, tmp, nil, "squash", rich, filepath.Join(tmp, "d.mcpack"), "-q")
+	if r.exitCode != 0 {
+		t.Fatal(r.stderr)
+	}
+	r = runBin(t, bin, tmp, nil, "check", rich)
+	if !strings.Contains(r.stdout, "--squash-subpacks") {
+		t.Errorf("check should hint at --squash-subpacks:\n%s", r.stdout)
+	}
+}
+
 func TestCLIUnknownCommandExitsUsage(t *testing.T) {
 	bin := buildBinary(t)
 	r := runBin(t, bin, t.TempDir(), nil, "frobnicate")
