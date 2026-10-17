@@ -1,0 +1,165 @@
+// Package pipeline is the library heart of shulker: load → parse → graph →
+// validate → transform → re-load → re-validate. It is usable without the
+// CLI (the Regolith filter mode and tests both drive it directly).
+//
+// The pipeline never writes an output the post-transform validator rejects —
+// a squash either ships a pack proven load-equivalent, or it fails loudly
+// with the full list of reasons.
+package pipeline
+
+import (
+	"fmt"
+	"sort"
+
+	"github.com/shulker-tools/shulker/internal/cache"
+	"github.com/shulker-tools/shulker/internal/graph"
+	"github.com/shulker-tools/shulker/internal/pack"
+	"github.com/shulker-tools/shulker/internal/transform"
+	"github.com/shulker-tools/shulker/internal/validate"
+)
+
+// Options configures a squash.
+type Options struct {
+	// Transforms selects the passes (see transform.Options).
+	Transforms transform.Options
+	// UseCache enables the content-addressed PNG transform cache
+	// (~/.cache/shulker, or CacheDir when set).
+	UseCache bool
+	CacheDir string
+	// Generator labels mapping/report outputs.
+	Generator string
+}
+
+// Result is a completed squash: the packs, the transform log, validation
+// findings, and report data.
+type Result struct {
+	In  *pack.Pack
+	Out *pack.Pack
+
+	Transform *transform.Result
+	Check     *validate.Result
+	Post      *validate.Result
+}
+
+// Squash loads `in` (a .mcpack/.zip file or a directory) and runs the full
+// pipeline in memory. Writing the outputs (pack bytes, mapping, report) is
+// the caller's job, so the CLI, the Regolith mode, and tests share exactly
+// one code path.
+func Squash(in string, opts Options) (*Result, error) {
+	p, err := pack.Load(in)
+	if err != nil {
+		return nil, fmt.Errorf("loading pack: %w", err)
+	}
+	return SquashPack(p, opts)
+}
+
+// SquashPack runs the pipeline over an already-loaded pack.
+func SquashPack(p *pack.Pack, opts Options) (*Result, error) {
+	res := &Result{In: p}
+
+	// 1. Parse + graph + pre-flight validation. Parse failures and manifest
+	// problems are hard errors: never transform a pack we cannot fully
+	// read.
+	docs, parseErrs := graph.ParseAll(p)
+	gIn, err := graph.Build(p, docs, parseErrs)
+	if err != nil {
+		return nil, err
+	}
+	res.Check = validate.Check(p, gIn)
+	if res.Check.HasErrors() {
+		return nil, fmt.Errorf("pack has problems shulker refuses to work around:\n%s",
+			formatFindings(res.Check.Errors()))
+	}
+
+	// 2. Transform (with optional PNG cache).
+	topts := opts.Transforms
+	if topts.PNGOptimize && opts.UseCache {
+		pngFn := topts.PNG
+		topts.PNG = makeCachedPNG(pngFn, opts.CacheDir)
+	}
+	tres, err := transform.Run(p, docs, gIn, topts)
+	if err != nil {
+		return nil, fmt.Errorf("transform failed: %w", err)
+	}
+	res.Transform = tres
+
+	// 3. Re-load the result as a real pack — classification, ordering, and
+	// manifest validation run again on exactly what will ship.
+	out, err := pack.FromFiles("squashed", tres.Files)
+	if err != nil {
+		return nil, fmt.Errorf("transformed pack is not loadable: %w", err)
+	}
+	res.Out = out
+
+	// 4. Post-transform validation: the squash is only real if the
+	// validator proves it. Failures here are shulker bugs, not pack
+	// problems — and they abort the build.
+	outDocs, outErrs := graph.ParseAll(out)
+	outG, err := graph.Build(out, outDocs, outErrs)
+	if err != nil {
+		return nil, err
+	}
+	res.Post = validate.PostTransform(p, gIn, out, outG, &validate.TransformLog{
+		Renames:      tres.Renames,
+		Rewrites:     tres.Rewrites,
+		PNGOptimized: tres.PNGOptimized,
+	})
+	if res.Post.HasErrors() {
+		return nil, fmt.Errorf("post-transform validation FAILED — this is a shulker bug, please report it:\n%s",
+			formatFindings(res.Post.Errors()))
+	}
+	return res, nil
+}
+
+// Warnings returns the aggregated non-blocking findings, sorted. Check
+// already folds the loader's warnings in, so they are not merged twice.
+func (r *Result) Warnings() []pack.Finding {
+	var out []pack.Finding
+	out = append(out, r.Check.Findings...)
+	out = append(out, r.Transform.Warnings...)
+	sort.SliceStable(out, func(i, j int) bool { return out[i].Path < out[j].Path })
+	return out
+}
+
+func formatFindings(fs []pack.Finding) string {
+	var lines []string
+	for _, f := range fs {
+		lines = append(lines, "  - "+f.String())
+	}
+	return joinLines(lines)
+}
+
+func joinLines(lines []string) string {
+	out := ""
+	for i, l := range lines {
+		if i > 0 {
+			out += "\n"
+		}
+		out += l
+	}
+	return out
+}
+
+// makeCachedPNG wraps a PNG transform (defaulting to transform.OptimizePNG)
+// with the content-addressed cache.
+func makeCachedPNG(pngFn func(data []byte) ([]byte, bool, error), dir string) func([]byte) ([]byte, bool, error) {
+	if pngFn == nil {
+		pngFn = transform.OptimizePNG
+	}
+	c, err := cache.New(dir, true)
+	if err != nil || c == nil {
+		return pngFn
+	}
+	return func(data []byte) ([]byte, bool, error) {
+		key := cache.PNGKey(data)
+		if out, changed, ok := c.Get(key); ok {
+			return out, changed, nil
+		}
+		out, changed, err := pngFn(data)
+		if err != nil {
+			return out, changed, err
+		}
+		c.Put(key, changed, out)
+		return out, changed, nil
+	}
+}
