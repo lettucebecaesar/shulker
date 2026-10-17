@@ -1,6 +1,8 @@
 package main
 
 import (
+	"archive/zip"
+	"bytes"
 	"fmt"
 	"os"
 	"os/exec"
@@ -356,6 +358,90 @@ func TestCLIAudioFFmpegGraceful(t *testing.T) {
 	}
 	if !strings.Contains(r.stdout, "passed through unchanged") {
 		t.Errorf("expected the passthrough warning:\n%s", r.stdout)
+	}
+}
+
+// Containers (.mcaddon/.mctemplate/.mcworld) squash through the CLI: RP
+// members transformed, BP members and world files untouched, and the
+// output loads back through check.
+func TestCLIContainerSquashAndCheck(t *testing.T) {
+	bin := buildBinary(t)
+	tmp := t.TempDir()
+
+	// Build a .mcaddon from the rich fixture + a BP member.
+	var entries bytes.Buffer
+	zw := zip.NewWriter(&entries)
+	richSrc, err := filepath.Abs(filepath.Join("..", "..", "testdata", "packs", "rich"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	err = filepath.WalkDir(richSrc, func(p string, d os.DirEntry, err error) error {
+		if err != nil || d.IsDir() {
+			return err
+		}
+		rel, err := filepath.Rel(richSrc, p)
+		if err != nil {
+			return err
+		}
+		data, err := os.ReadFile(p)
+		if err != nil {
+			return err
+		}
+		w, err := zw.Create("MyRP/" + filepath.ToSlash(rel))
+		if err != nil {
+			return err
+		}
+		_, err = w.Write(data)
+		return err
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	w, err := zw.Create("MyBP/manifest.json")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := w.Write([]byte(`{"format_version":2,"header":{"name":"BP","uuid":"3f7f7d1e-ec1e-4a2e-bcd5-69b1b70cf4a6","version":[1,0,0]},"modules":[{"type":"data","uuid":"a1944c3a-a34c-45d5-ae42-2d388d7ee7e4","version":[1,0,0]}]}`)); err != nil {
+		t.Fatal(err)
+	}
+	if err := zw.Close(); err != nil {
+		t.Fatal(err)
+	}
+	addon := filepath.Join(tmp, "bundle.mcaddon")
+	if err := os.WriteFile(addon, entries.Bytes(), 0o644); err != nil {
+		t.Fatal(err)
+	}
+
+	// check before: the RP member validates, the BP is inventoried.
+	r := runBin(t, bin, tmp, nil, "check", addon)
+	if r.exitCode != 0 {
+		t.Fatalf("check container failed (%d):\n%s\n%s", r.exitCode, r.stdout, r.stderr)
+	}
+	if !strings.Contains(r.stdout, "MyRP") || !strings.Contains(r.stdout, "behavior pack") {
+		t.Errorf("check output missing member inventory:\n%s", r.stdout)
+	}
+
+	// squash: default output name preserves the container kind.
+	r = runBin(t, bin, tmp, nil, "squash", addon, "-q")
+	if r.exitCode != 0 {
+		t.Fatalf("squash container failed (%d):\n%s\n%s", r.exitCode, r.stdout, r.stderr)
+	}
+	out := filepath.Join(tmp, "bundle.squashed.mcaddon")
+	if _, err := os.Stat(out); err != nil {
+		t.Fatalf("expected default container output %s: %v", out, err)
+	}
+	// The merged mapping covers the member prefix.
+	mapData, err := os.ReadFile(filepath.Join(tmp, "bundle.squashed.map.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(mapData), "MyRP/entity/_0.entity.json") {
+		t.Errorf("mapping missing prefixed member paths:\n%s", mapData)
+	}
+	// The output container still checks green.
+	r = runBin(t, bin, tmp, nil, "check", out)
+	if r.exitCode != 0 {
+		t.Errorf("check on squashed container failed:\n%s\n%s", r.stdout, r.stderr)
 	}
 }
 

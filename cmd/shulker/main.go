@@ -26,8 +26,13 @@ var version = "0.1.0"
 const usageText = `shulker — Bedrock pack squasher & obfuscator
 
 Usage:
-  shulker squash <in> [out]     squash a pack (.mcpack/.zip file or directory)
+  shulker squash <in> [out]     squash a pack (.mcpack/.zip file or directory);
+                                also accepts .mcaddon/.mctemplate/.mcworld
+                                containers — resource pack members are
+                                squashed, behavior packs and world files
+                                pass through byte-identically
   shulker check <pack>          validate a pack without changing anything
+                                (containers: validates each RP member)
   shulker map <mapping.json>    inspect a squash mapping
                                 --reverse <pack> <outdir>: re-derive original layout
   shulker regolith              Regolith filter mode (invoked by Regolith)
@@ -214,6 +219,13 @@ func cmdSquash(args []string) {
 	opts.Transforms.Workers = *workers
 	opts.UseCache = !*noCache
 
+	// Containers (.mcaddon/.mctemplate/.mcworld): squash every resource
+	// pack member, pass behavior packs and world files through verbatim.
+	if pack.ContainerExt(strings.ToLower(filepath.Ext(in))) {
+		cmdSquashContainer(in, out, opts, *outMap, *reportFile, *quiet)
+		return
+	}
+
 	if !*quiet {
 		fmt.Printf("shulker %s — squashing %s\n", version, in)
 	}
@@ -268,6 +280,11 @@ func cmdSquash(args []string) {
 
 func defaultOutPath(in string) string {
 	ext := strings.ToLower(filepath.Ext(in))
+	if pack.ContainerExt(ext) {
+		// Preserve the container kind: bundle.mcaddon -> bundle.squashed.mcaddon
+		base := filepath.Base(in)
+		return strings.TrimSuffix(base, ext) + ".squashed" + ext
+	}
 	base := filepath.Base(in)
 	switch ext {
 	case ".mcpack", ".zip":
@@ -297,6 +314,11 @@ func cmdCheck(args []string) {
 	}
 	p, err := pack.Load(rest[0])
 	if err != nil {
+		// Containers get their own check flow (per-member validation).
+		if pack.ContainerExt(strings.ToLower(filepath.Ext(rest[0]))) {
+			cmdCheckContainer(rest[0])
+			return
+		}
 		fail("%v", err)
 	}
 	docs, parseErrs := graph.ParseAll(p)

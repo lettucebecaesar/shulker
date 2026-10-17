@@ -7,6 +7,7 @@ package pack
 
 import (
 	"archive/zip"
+	"bytes"
 	"fmt"
 	"io"
 	"io/fs"
@@ -178,6 +179,16 @@ func LoadZip(path string) (*Pack, error) {
 		return nil, fmt.Errorf("%q is not a readable zip archive: %w", path, err)
 	}
 	return loadFromZip(zr, path)
+}
+
+// LoadZipBytes loads a resource pack from in-memory zip bytes (used for
+// packs nested inside containers).
+func LoadZipBytes(data []byte, source string) (*Pack, error) {
+	zr, err := zip.NewReader(bytes.NewReader(data), int64(len(data)))
+	if err != nil {
+		return nil, fmt.Errorf("%q is not a readable zip archive: %w", source, err)
+	}
+	return loadFromZip(zr, source)
 }
 
 func loadFromZip(zr *zip.Reader, source string) (*Pack, error) {
