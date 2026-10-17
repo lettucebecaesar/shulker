@@ -199,11 +199,14 @@ refused and told me why," never "shulker corrupted my pack."
 
 ### Why is my `textures/blocks/stone.png` not renamed?
 
-It's a vanilla path: the engine (and vanilla-side JSON you can't see) may
-resolve it by its exact location. shulker renames only files whose references
-are provably pack-internal. Classic override textures keep their paths and
-their exact bytes. See [docs/INVARIANTS.md](docs/INVARIANTS.md) for the full
-policy.
+It's a genuine vanilla path: the engine and vanilla-side JSON you can't see may
+resolve it by exactly that location. shulker embeds a frozen list of every vanilla
+resource pack path (from the complete
+[MCBVanillaResourcePack](https://github.com/ZtechNetwork/MCBVanillaResourcePack)
+mirror, regenerable with `tools/vanilla-gen`) and never renames — or re-encodes, by
+default — a file matching it, exactly or extension-insensitively. Custom paths are
+free to rename even under vanilla directories. See
+[docs/INVARIANTS.md](docs/INVARIANTS.md) for the full policy.
 
 ### Why were my PBR textures (`_mer`, `_normal`, `_heightmap`, `_mers`) renamed together or not at all?
 
@@ -247,8 +250,9 @@ human check after squashing a real pack:
   the [roadmap](docs/ROADMAP.md).
 - Audio (`.ogg`) and lang files pass through byte-for-byte; TGA/JPG pass
   through (only PNG is re-encoded).
-- The vanilla-path deny-list is a curated conservative approximation; a
-  generated frozen vanilla path list is on the v0.2 roadmap.
+- The frozen vanilla path list is a snapshot of vanilla at generation time
+  (provenance embedded in the artifact). Staleness over-protects; regenerate
+  after major Bedrock releases with `go run ./tools/vanilla-gen`.
 
 ## Development
 

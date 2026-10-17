@@ -3,29 +3,30 @@ package graph
 import (
 	"path"
 	"strings"
+
+	"github.com/shulker-tools/shulker/internal/vanilla"
 )
 
-// DenyPrefixes are vanilla-sensitive subtrees where invisible vanilla-side
-// references are known to be dense. A pack file inside these prefixes is
-// never renamed, even when pack-internal references exist, because the
-// engine may also resolve these paths from vanilla JSON we cannot see.
+// DenyPrefixes are engine-hardcoded subtrees where the engine resolves
+// content by fixed paths or path conventions that no pack JSON reveals
+// (sky/environment lookups, colormaps, glyph sheets, json-ui file names,
+// lang). Files inside are never renamed regardless of pack-internal
+// references.
 //
-// This list is the documented, honest v0.1 approximation of invariant 3
-// ("vanilla-override protection"). The zero-inbound-edge rule below already
-// protects classic override textures (they have no pack-internal refs); the
-// deny-list guards the residual case: files that have BOTH pack-internal
-// refs AND possible vanilla refs (e.g. a pack that redefines the "stone"
-// atlas short name to point at its own textures/blocks/stone.png).
+// v0.2 change: the broad "textures/blocks/" and "textures/particle/"
+// prefixes are GONE. Actual vanilla paths under those trees are now
+// protected exhaustively by the frozen vanilla path list (internal/vanilla,
+// exact + extension-insensitive matching), which simultaneously unblocks
+// custom assets that merely live under vanilla directories — a block mod
+// can now rename its textures/blocks/my_custom_block.png.
 var DenyPrefixes = []string{
-	"textures/blocks/",      // vanilla blocks.json -> vanilla terrain_texture
 	"textures/environment/", // engine-hardcoded (sky, moon, sun, clouds…)
-	"textures/particle/",    // vanilla particle JSON references these by path
 	"textures/colormap/",    // engine colormap lookups (birch/pine…)
 	"textures/misc/",        // vanilla item_texture references (potions, missing_texture…)
 	"font/",                 // glyph sheets addressed by fixed code paths
 	"texts/",                // lang files; keys are sacred anyway
 	"ui/",                   // engine references ui/*.json by fixed name
-	"subpacks/",             // untouchable nested packs in v0.1
+	"subpacks/",             // untouchable nested packs (unless --squash-subpacks)
 }
 
 // IsDenyListed reports whether a pack path sits in a rename-denied subtree.
@@ -36,6 +37,16 @@ func IsDenyListed(p string) bool {
 		}
 	}
 	return false
+}
+
+// IsVanillaPath reports whether a pack path matches the frozen vanilla
+// resource pack universe — exactly, or extension-insensitively (a pack's
+// .tga shadowing vanilla's .png at the same reference target). The planner
+// refuses to rename such files: the engine and vanilla-side JSON may
+// resolve them by exactly that path, and those references are invisible to
+// us. See internal/vanilla for provenance and regeneration.
+func IsVanillaPath(p string) bool {
+	return vanilla.IsVanillaPath(p) || vanilla.IsVanillaTarget(p)
 }
 
 // NeverRename are individual engine-fixed files. Registries can be minified

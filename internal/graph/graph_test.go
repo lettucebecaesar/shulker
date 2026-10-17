@@ -502,23 +502,51 @@ func TestPreservedSuffix(t *testing.T) {
 }
 
 func TestDenyList(t *testing.T) {
+	// Engine-hardcoded subtrees stay prefix-denied.
 	for _, p := range []string{
-		"textures/blocks/stone.png", "textures/environment/moon.png",
-		"textures/particle/particles.png", "textures/colormap/birch.png",
-		"textures/misc/missing_texture.png", "font/glyph_20.png",
-		"texts/en_US.lang", "ui/hud_screen.json", "subpacks/low/x.png",
+		"textures/environment/moon.png",
+		"textures/colormap/birch.png",
+		"textures/misc/missing_texture.png",
+		"font/glyph_20.png",
+		"texts/en_US.lang",
+		"ui/hud_screen.json",
+		"subpacks/low/x.png",
 	} {
 		if !IsDenyListed(p) {
 			t.Errorf("%s should be deny-listed", p)
 		}
 	}
+	// v0.2: textures/blocks/ and textures/particle/ are no longer
+	// prefix-denied — actual vanilla paths are protected exhaustively by
+	// the frozen vanilla list instead, which is what lets CUSTOM assets
+	// under vanilla directories rename.
+	for _, p := range []string{
+		"textures/blocks/stone.png",
+		"textures/particle/particles.png",
+		"sounds/mob/pig/say1.ogg",
+		"entity/pig.entity.json",
+		"models/entity/pig.geo.json", // a real vanilla path; scanned-dir
+		// files rename safely anyway (identifier lookup), so the frozen
+		// match is belt-and-braces there.
+	} {
+		if IsDenyListed(p) {
+			t.Errorf("%s should not be prefix-denied anymore", p)
+		}
+		if !IsVanillaPath(p) {
+			t.Errorf("%s should be frozen-list protected", p)
+		}
+	}
 	for _, p := range []string{
 		"textures/custom/block.png", "textures/entity/mob.png",
 		"sounds/custom/pop.ogg", "entity/mob.entity.json",
-		"models/entity/pig.geo.json",
+		"models/entity/mymob.geo.json",
+		"textures/blocks/shulker_custom_block.png",
 	} {
 		if IsDenyListed(p) {
 			t.Errorf("%s should NOT be deny-listed", p)
+		}
+		if IsVanillaPath(p) {
+			t.Errorf("%s is custom; the frozen list must not contain it", p)
 		}
 	}
 	// Registries are never renamed even though they are not deny-prefixed.

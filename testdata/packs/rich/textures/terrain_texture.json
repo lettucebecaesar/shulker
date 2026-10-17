@@ -23,10 +23,16 @@
 			"textures": "textures/custom/texset_ref",
 		},
 		// Vanilla-override case: this redefines the vanilla "stone" short
-		// name to a pack file at a vanilla path. The deny-list must keep
-		// this file exactly where it is.
+		// name to a pack file at a vanilla path. The frozen vanilla list
+		// (v0.2) must keep this file exactly where it is.
 		"stone": {
 			"textures": "textures/blocks/stone",
+		},
+		// v0.2 case: a CUSTOM texture that merely lives under a vanilla
+		// directory. It is not a vanilla path, so nothing invisible can
+		// reference it — the frozen-list matching must let it rename.
+		"shulker.custom_dir_block": {
+			"textures": "textures/blocks/shulker_custom_block",
 		},
 		// Multi-variant array shape from vanilla (grass_top style).
 		"shulker.multi": {

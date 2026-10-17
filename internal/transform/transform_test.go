@@ -48,23 +48,26 @@ func TestSquashRichFixtureRenames(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// Exact deterministic short names, in sorted-assignment order:
-	// block set, flip, item, mob, mob_sad, particles, pbr set, ui_free.
+	// Exact deterministic short names, in sorted-assignment order. The
+	// v0.2 frozen vanilla list unblocks the custom block texture that
+	// lives under textures/blocks/ — it takes _0 as the first eligible
+	// texture and shifts every later assignment.
 	want := map[string]string{
-		"textures/custom/block.png":                                    "textures/_0.png",
-		"textures/custom/block_mer.png":                                "textures/_0_mer.png",
-		"textures/custom/block_normal.png":                             "textures/_0_normal.png",
-		"textures/custom/block_heightmap.png":                          "textures/_0_heightmap.png",
-		"textures/custom/flip.png":                                     "textures/_1.png",
-		"textures/custom/item.png":                                     "textures/_2.png",
-		"textures/custom/mob.png":                                      "textures/_3.png",
-		"textures/custom/mob_sad.png":                                  "textures/_4.png",
-		"textures/custom/particles.png":                                "textures/_5.png",
-		"textures/custom/pbr.png":                                      "textures/_6.png",
-		"textures/custom/pbr_mer.png":                                  "textures/_6_mer.png",
-		"textures/custom/pbr_normal.png":                               "textures/_6_normal.png",
-		"textures/custom/pbr_mers.tga":                                 "textures/_6_mers.tga",
-		"textures/custom/ui_free.png":                                  "textures/_7.png",
+		"textures/blocks/shulker_custom_block.png":                     "textures/_0.png",
+		"textures/custom/block.png":                                    "textures/_1.png",
+		"textures/custom/block_mer.png":                                "textures/_1_mer.png",
+		"textures/custom/block_normal.png":                             "textures/_1_normal.png",
+		"textures/custom/block_heightmap.png":                          "textures/_1_heightmap.png",
+		"textures/custom/flip.png":                                     "textures/_2.png",
+		"textures/custom/item.png":                                     "textures/_3.png",
+		"textures/custom/mob.png":                                      "textures/_4.png",
+		"textures/custom/mob_sad.png":                                  "textures/_5.png",
+		"textures/custom/particles.png":                                "textures/_6.png",
+		"textures/custom/pbr.png":                                      "textures/_7.png",
+		"textures/custom/pbr_mer.png":                                  "textures/_7_mer.png",
+		"textures/custom/pbr_normal.png":                               "textures/_7_normal.png",
+		"textures/custom/pbr_mers.tga":                                 "textures/_7_mers.tga",
+		"textures/custom/ui_free.png":                                  "textures/_8.png",
 		"sounds/custom/pop.ogg":                                        "sounds/_0.ogg",
 		"entity/shulker_mob.entity.json":                               "entity/_0.entity.json",
 		"attachables/shulker_hat.json":                                 "attachables/_0.json",
@@ -129,21 +132,32 @@ func TestSquashRichFixtureRenames(t *testing.T) {
 		return "", false
 	}
 	rw, ok := findRewrite("entity/shulker_mob.entity.json", "textures/custom/mob")
-	if !ok || rw != "textures/_3" {
-		t.Errorf("entity texture rewrite = %q %v, want textures/_3", rw, ok)
+	if !ok || rw != "textures/_4" {
+		t.Errorf("entity texture rewrite = %q %v, want textures/_4", rw, ok)
 	}
-	if rw, ok := findRewrite("textures/terrain_texture.json", "textures/custom/block"); !ok || rw != "textures/_0" {
+	if rw, ok := findRewrite("textures/terrain_texture.json", "textures/custom/block"); !ok || rw != "textures/_1" {
 		t.Errorf("terrain block rewrite = %q %v", rw, ok)
+	}
+	// The v0.2 headline: a custom texture under a vanilla directory
+	// renames AND its atlas reference rewrites.
+	if rw, ok := findRewrite("textures/terrain_texture.json", "textures/blocks/shulker_custom_block"); !ok || rw != "textures/_0" {
+		t.Errorf("custom-under-blocks rewrite = %q %v, want textures/_0", rw, ok)
 	}
 	if rw, ok := findRewrite("sounds/sound_definitions.json", "sounds/custom/pop"); !ok || rw != "sounds/_0" {
 		t.Errorf("sound def rewrite = %q %v", rw, ok)
 	}
-	if rw, ok := findRewrite("textures_list.json", "textures/custom/mob.png"); !ok || rw != "textures/_3.png" {
+	if rw, ok := findRewrite("textures_list.json", "textures/custom/mob.png"); !ok || rw != "textures/_4.png" {
 		t.Errorf("textures_list rewrite = %q %v", rw, ok)
 	}
-	// Vanilla override in the atlas: deny-listed file, reference untouched.
+	// Vanilla override in the atlas: frozen-list-protected, reference
+	// untouched.
 	if _, changed := findRewrite("textures/terrain_texture.json", "textures/blocks/stone"); changed {
 		t.Error("vanilla-override texture must keep its path and its reference")
+	}
+	// The skip reason must point at the vanilla list (not the old prefix
+	// deny-list) so creators can trust the "why".
+	if r := res.SkipReasons["textures/blocks/stone.png"]; !strings.Contains(r, "vanilla resource pack path") {
+		t.Errorf("stone.png skip reason = %q, want frozen-list explanation", r)
 	}
 
 	// Minify: comments/BOM gone, float noise normalized, key order intact.

@@ -14,9 +14,15 @@ import (
 // everything from the packs themselves and refuses to trust the log beyond
 // using it as the allowlist.
 type TransformLog struct {
-	Renames      []graph.Rename
-	Rewrites     []graph.Rewrite
-	PNGOptimized map[string]bool // original paths of re-encoded textures
+	Renames  []graph.Rename
+	Rewrites []graph.Rewrite
+	// PNGOptimized maps ORIGINAL paths of re-encoded textures (and actually
+	// got smaller) to true.
+	PNGOptimized map[string]bool
+	// OverridesOptimized lists vanilla-path/deny-listed textures that were
+	// re-encoded under the explicit --png-optimize-overrides opt-in.
+	// Without that flag, such textures must stay byte-identical.
+	OverridesOptimized map[string]bool
 }
 
 // PostTransform proves the output pack is load-equivalent to the input:
@@ -268,6 +274,10 @@ func (r *Result) checkProtected(in *pack.Pack, log *TransformLog) {
 		if graph.NeverRename(rn.From) {
 			r.add(pack.SeverityError, rn.From, "engine-fixed or deny-listed path was renamed")
 		}
+		if graph.IsVanillaPath(rn.From) {
+			r.add(pack.SeverityError, rn.From,
+				"vanilla path was renamed — overrides must keep their exact paths")
+		}
 	}
 	for orig := range log.PNGOptimized {
 		f, ok := in.File(orig)
@@ -278,8 +288,15 @@ func (r *Result) checkProtected(in *pack.Pack, log *TransformLog) {
 		if f.Class != pack.ClassTexture {
 			r.add(pack.SeverityError, orig, "PNG optimization logged for a non-texture file")
 		}
-		if graph.IsDenyListed(orig) || graph.NeverRename(orig) {
-			r.add(pack.SeverityError, orig, "vanilla-override texture was re-encoded (must stay byte-identical)")
+		if log.OverridesOptimized[orig] {
+			// Opt-in override re-encode (--png-optimize-overrides):
+			// allowed for vanilla-path/deny-listed textures, pixel-verified
+			// by the transform.
+			continue
+		}
+		if graph.IsDenyListed(orig) || graph.NeverRename(orig) || graph.IsVanillaPath(orig) {
+			r.add(pack.SeverityError, orig,
+				"vanilla-override texture was re-encoded (must stay byte-identical; use --png-optimize-overrides to opt in)")
 		}
 	}
 }

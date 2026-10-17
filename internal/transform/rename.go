@@ -121,20 +121,41 @@ func PlanRenames(p *pack.Pack, g *graph.Graph, opts Options) *Plan {
 	return plan
 }
 
+// renameBlocked returns the human-facing reason a file must keep its path,
+// or "" when it may rename. The checks, in order:
+//
+//  1. engine-fixed files and subtree conventions (registries, ui/, font/…),
+//  2. vanilla path matches — exact or extension-insensitive against the
+//     frozen vanilla list. Invisible vanilla-side references are exactly
+//     the thing invariant 3 forbids us from gambling on.
+func renameBlocked(p string) string {
+	switch {
+	case graph.NeverRename(p):
+		return "engine-fixed path: left in place"
+	case graph.IsDenyListed(p):
+		return "engine-hardcoded subtree (deny-listed): left untouched"
+	case graph.IsVanillaPath(p):
+		return "matches a vanilla resource pack path (frozen vanilla list): left untouched"
+	}
+	return ""
+}
+
 func (pl *Planner) planTextureGroup(g *graph.Graph, members []string, color string, set *graph.TextureSet, plan *Plan, taken map[string]bool, counter *int) {
 	// Eligibility first — it is a property of the input pack and is shared
 	// by the rename AND png-optimize passes.
-	if graph.IsDenyListed(color) || graph.NeverRename(color) {
+	if reason := renameBlocked(color); reason != "" {
 		for _, m := range members {
-			plan.SkipReasons[m] = "vanilla-sensitive path (deny-listed): left untouched"
+			plan.SkipReasons[m] = reason
 		}
 		return
 	}
 	colorEdges := 0
 	blockers := map[string]string{}
 	for _, m := range members {
-		if graph.IsDenyListed(m) || graph.NeverRename(m) {
-			plan.SkipReasons[m] = "vanilla-sensitive path (deny-listed): left untouched"
+		if reason := renameBlocked(m); reason != "" {
+			for _, mm := range members {
+				plan.SkipReasons[mm] = "PBR set member locked: " + reason
+			}
 			return
 		}
 		for _, e := range g.Inbound(m) {
@@ -198,8 +219,8 @@ func (pl *Planner) planTextureGroup(g *graph.Graph, members []string, color stri
 }
 
 func (pl *Planner) planSoundFile(g *graph.Graph, file string, plan *Plan, taken map[string]bool, counter *int) {
-	if graph.IsDenyListed(file) || graph.NeverRename(file) {
-		plan.SkipReasons[file] = "vanilla-sensitive path (deny-listed): left untouched"
+	if reason := renameBlocked(file); reason != "" {
+		plan.SkipReasons[file] = reason
 		return
 	}
 	rewriteable := 0

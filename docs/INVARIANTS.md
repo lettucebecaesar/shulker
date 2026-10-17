@@ -28,7 +28,7 @@ any uncertainty resolves to "skip the transform and log a warning."
 7. **Preserve JSON key order** and tolerate `//` comments, trailing commas, and UTF-8
    BOMs — vanilla and community files routinely contain all three.
 
-## v0.1 conservative rename rules (how invariant 3 is implemented)
+## v0.2 rename rules (how invariant 3 is implemented)
 
 A file is rename-eligible only when **all** of the following hold:
 
@@ -40,12 +40,28 @@ A file is rename-eligible only when **all** of the following hold:
   inbound reference, every such reference is in a position we know how to rewrite, and
   **zero** references appear in unknown-schema positions (unknown JSON files referencing
   an asset block that asset's rename — by design).
-- It is not under a vanilla-sensitive deny-listed prefix (`textures/blocks/`,
-  `textures/environment/`, `textures/particle/`, `textures/colormap/`,
-  `textures/misc/`, `font/`, `texts/`, `ui/`, `subpacks/`) where invisible vanilla-side
-  references are known to be dense.
+- Its path does not match the **frozen vanilla path list** (embedded from
+  [ZtechNetwork/MCBVanillaResourcePack](https://github.com/ZtechNetwork/MCBVanillaResourcePack),
+  a complete mirror of the shipped vanilla resource pack — file paths plus every
+  texture/sound reference target extracted by shulker's own graph parsers). Matching is
+  exact and extension-insensitive, so a pack's `.tga` shadowing vanilla's `.png` at the
+  same reference target is protected too. **Consequence:** genuine overrides like
+  `textures/blocks/stone.png` stay put, while custom assets that merely live under
+  vanilla directories (`textures/blocks/my_block.png`) rename freely — vanilla cannot
+  reference a path it does not have.
+- It is not under an engine-hardcoded prefix (`textures/environment/`,
+  `textures/colormap/`, `textures/misc/`, `font/`, `texts/`, `ui/`, `subpacks/`) —
+  fixed engine lookups no JSON reveals.
 - Its whole PBR texture set (if any) passes the same checks.
 
 Identifier-scanned files are renamed *within their directory* with their conventional
 suffix preserved (`.geo.json` stays `.geo.json`, etc.), so any directory glob the engine
-uses keeps matching.
+uses keeps matching — and they are exempt from the vanilla-path check because the engine
+resolves them by identifier, never by path.
+
+**Residual risk, stated honestly:** the frozen list is a snapshot. Vanilla adds paths
+every release; a pack file at a *new* vanilla path (with pack-internal references) could
+in principle be renamed. Staleness in the other direction only over-protects. Regenerate
+after major Bedrock releases with `go run ./tools/vanilla-gen` (procedure in the tool
+header); the provenance commit is embedded in the artifact and shown by the frozen list
+itself.

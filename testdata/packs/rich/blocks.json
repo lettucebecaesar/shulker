@@ -32,5 +32,9 @@
 	"shulker:vanilla_stone_block": {
 		"sound": "stone",
 		"textures": "stone"
+	},
+	"shulker:custom_dir_block": {
+		"sound": "stone",
+		"textures": "shulker.custom_dir_block"
 	}
 }
