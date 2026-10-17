@@ -31,14 +31,31 @@ $ shulker squash MyPack.mcpack
 
 ## Install
 
-Build from source (the only supported path for now):
+Requires [Go](https://go.dev/dl/) 1.22+.
+
+The easy way (installs the `shulker` binary into your Go bin directory):
 
 ```
-git clone <this repo> && cd shulker
+go install github.com/lettucebecaesar/shulker/cmd/shulker@latest
+```
+
+Make sure your Go bin directory is on your PATH (on Windows that is usually
+`%USERPROFILE%\go\bin`; on Linux/macOS `$(go env GOPATH)/bin`). Verify:
+
+```
+shulker version
+```
+
+Or build from source:
+
+```
+git clone https://github.com/lettucebecaesar/shulker.git && cd shulker
 make build          # or: go build -o shulker ./cmd/shulker
 ```
 
-CI builds and tests every push (Go build + vet + race tests + golangci-lint).
+CI builds and tests every push (Go build + vet + race tests + golangci-lint),
+and every release tag is installable with the same `go install` command by
+pinning a version, e.g. `@v0.2.0`.
 
 ## Usage
 
