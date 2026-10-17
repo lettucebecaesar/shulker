@@ -16,8 +16,11 @@ import (
 //     indentation, trailing commas, BOMs, float noise) and must shrink by
 //     at least 25%.
 //   - png_heavy models community-tool-saved PNGs (BestSpeed sprites) and
-//     must shrink by at least 10% — without quantization, which v0.1
-//     deliberately does not do.
+//     must shrink by at least 10% — without quantization, which stays
+//     opt-in.
+//   - ui_palette models low-color UI-style art — the v0.2 lossless
+//     palette conversion's showcase — and must shrink by at least 25%
+//     while staying pixel-identical.
 func TestBenchmarkFixtureReductions(t *testing.T) {
 	cases := []struct {
 		name       string
@@ -25,6 +28,7 @@ func TestBenchmarkFixtureReductions(t *testing.T) {
 	}{
 		{"json_heavy", 25.0},
 		{"png_heavy", 10.0},
+		{"ui_palette", 25.0},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {

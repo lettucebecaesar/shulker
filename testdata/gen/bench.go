@@ -226,6 +226,82 @@ func genJSONHeavy(dir string) error {
 	return nil
 }
 
+// genUIPalette writes a pack of UI-style sprites: flat colors, hard edges,
+// binary alpha, few distinct colors per sprite — the art style where
+// shulker v0.2's lossless palette conversion (RGBA -> indexed PNG) wins
+// big. Sprites are BestSpeed-encoded, as community exporters save them.
+func genUIPalette(dir string) error {
+	if err := os.MkdirAll(filepath.Join(dir, "textures/custom"), 0o755); err != nil {
+		return err
+	}
+	manifest := `{
+	"format_version": 2,
+	"header": {
+		"name": "UI Palette Benchmark",
+		"description": "Deterministic fixture: low-color sprites for palette conversion",
+		"uuid": "66c6e9a8-3093-462a-9c36-dbb052165822",
+		"version": [1, 0, 0],
+		"min_engine_version": [1, 21, 0]
+	},
+	"modules": [
+		{
+			"description": "resources",
+			"type": "resources",
+			"uuid": "743f6949-53be-44b6-b326-398005028819",
+			"version": [1, 0, 0]
+		}
+	]
+}
+`
+	if err := os.WriteFile(filepath.Join(dir, "manifest.json"), []byte(manifest), 0o644); err != nil {
+		return err
+	}
+	if err := writePNG(filepath.Join(dir, "pack_icon.png"), color.RGBA{0x30, 0x60, 0x90, 0xFF}); err != nil {
+		return err
+	}
+
+	const n = 16
+	var atlas strings.Builder
+	atlas.WriteString("{\n\t\"texture_data\": {\n")
+	for i := 0; i < n; i++ {
+		fmt.Fprintf(&atlas, "\t\t\"bench.ui_%02d\": {\"textures\": \"textures/custom/ui_%02d\"},\n", i, i)
+	}
+	atlas.WriteString("\t}\n}\n")
+	if err := os.WriteFile(filepath.Join(dir, "textures/terrain_texture.json"), []byte(atlas.String()), 0o644); err != nil {
+		return err
+	}
+
+	fast := png.Encoder{CompressionLevel: png.BestSpeed}
+	for i := 0; i < n; i++ {
+		img := image.NewNRGBA(image.Rect(0, 0, 128, 128))
+		// A small fixed ramp: 32 flat colors, plus a two-color frame.
+		shade := uint8(i * 4)
+		for y := 0; y < 128; y++ {
+			for x := 0; x < 128; x++ {
+				switch {
+				case x < 4 || y < 4 || x >= 124 || y >= 124:
+					img.SetNRGBA(x, y, color.NRGBA{0x1A, 0x1A, 0x1A, 0xFF})
+				case (x/16+y/16)%2 == 0:
+					img.SetNRGBA(x, y, color.NRGBA{shade + 0x40, 0x80, 0xC0, 0xFF})
+				case (x/16+y/16)%3 == 0:
+					img.SetNRGBA(x, y, color.NRGBA{shade, shade, shade, 0xFF})
+				default:
+					img.SetNRGBA(x, y, color.NRGBA{0, 0, 0, 0}) // binary transparency
+				}
+			}
+		}
+		var buf bytes.Buffer
+		if err := fast.Encode(&buf, img); err != nil {
+			return err
+		}
+		p := filepath.Join(dir, fmt.Sprintf("textures/custom/ui_%02d.png", i))
+		if err := os.WriteFile(p, buf.Bytes(), 0o644); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 // ---------------------------------------------------------------- png_heavy
 
 // genPNGHeavy writes a pack whose weight is PNG bytes: 24 BestSpeed-encoded

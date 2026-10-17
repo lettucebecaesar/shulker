@@ -42,7 +42,9 @@ From `Bedrock-OSS/regolith` `regolith/filter_exe.go` and `regolith/utils.go`:
   signal), or a leading JSON object in argv.
 - Settings JSON maps onto squash flags: `no-rename`,
   `no-rename-textures`, `no-rename-sounds`, `no-rename-identdirs`,
-  `no-minify`, `no-png`, `no-cache`, `workers`.
+  `no-minify`, `no-png`, `no-cache`, `workers`, plus the v0.2 opt-ins:
+  `png-optimize-overrides`, `png-quantize`, `png-quantize-colors`,
+  `audio-ffmpeg`, `audio-quality`, `squash-subpacks`.
 
 ## Project layout (tested)
 

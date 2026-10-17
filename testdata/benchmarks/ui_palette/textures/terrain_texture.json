@@ -1,0 +1,20 @@
+{
+	"texture_data": {
+		"bench.ui_00": {"textures": "textures/custom/ui_00"},
+		"bench.ui_01": {"textures": "textures/custom/ui_01"},
+		"bench.ui_02": {"textures": "textures/custom/ui_02"},
+		"bench.ui_03": {"textures": "textures/custom/ui_03"},
+		"bench.ui_04": {"textures": "textures/custom/ui_04"},
+		"bench.ui_05": {"textures": "textures/custom/ui_05"},
+		"bench.ui_06": {"textures": "textures/custom/ui_06"},
+		"bench.ui_07": {"textures": "textures/custom/ui_07"},
+		"bench.ui_08": {"textures": "textures/custom/ui_08"},
+		"bench.ui_09": {"textures": "textures/custom/ui_09"},
+		"bench.ui_10": {"textures": "textures/custom/ui_10"},
+		"bench.ui_11": {"textures": "textures/custom/ui_11"},
+		"bench.ui_12": {"textures": "textures/custom/ui_12"},
+		"bench.ui_13": {"textures": "textures/custom/ui_13"},
+		"bench.ui_14": {"textures": "textures/custom/ui_14"},
+		"bench.ui_15": {"textures": "textures/custom/ui_15"},
+	}
+}

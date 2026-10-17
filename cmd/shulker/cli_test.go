@@ -13,7 +13,7 @@ import (
 )
 
 // The tests share one binary build (TestMain) and drive the real compiled
-// file I/O, exit codes, and the Regolith exe-filter invocation shape â€” the
+// file I/O, exit codes, and the Regolith exe-filter invocation shape — the
 // exact surfaces humans and Regolith touch.
 var (
 	binPath string
@@ -209,7 +209,7 @@ func TestCLIRegolithMode(t *testing.T) {
 }
 
 // The zero-argument shape: Regolith invokes exe filters with NO argv at all
-// when the profile filter has empty settings — the environment pair
+// when the profile filter has empty settings � the environment pair
 // (FILTER_DIR/ROOT_DIR) is the only signal. This mirrors a real run.
 func TestCLIRegolithZeroArgInvocation(t *testing.T) {
 	bin := buildBinary(t)
@@ -242,7 +242,7 @@ func TestCLIRegolithZeroArgInvocation(t *testing.T) {
 	}
 }
 
-// Flags work before or after positionals — users type both orders.
+// Flags work before or after positionals � users type both orders.
 func TestCLIFlagsAfterPositionals(t *testing.T) {
 	bin := buildBinary(t)
 	rich, err := filepath.Abs(filepath.Join("..", "..", "testdata", "packs", "rich"))
@@ -279,7 +279,7 @@ func TestCLIFlagsAfterPositionals(t *testing.T) {
 }
 
 // Regolith settings with no-* keys must DISABLE the corresponding pass
-// (v0.1 bug: they used to enable it — this test locks the fix).
+// (v0.1 bug: they used to enable it � this test locks the fix).
 func TestCLIRegolithSettingsSemantics(t *testing.T) {
 	bin := buildBinary(t)
 	stage := t.TempDir()

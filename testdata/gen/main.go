@@ -1,12 +1,13 @@
-//go:build ignore
-
 // Command testdata/gen materializes the binary fixture files (PNGs, a TGA,
-// an OGG stub) used by the golden fixture packs. Everything it writes is
-// deterministic: fixed colors, no timestamps, no randomness. Text fixtures
-// are authored by hand in the repository; only bytes that cannot be written
-// as reviewable text live here.
+// an OGG stub) used by the golden fixture packs, and generates the two
+// benchmark packs. Everything it writes is deterministic: fixed colors, no
+// timestamps, no randomness. Text fixtures are authored by hand in the
+// repository; only bytes that cannot be written as reviewable text live
+// here.
 //
-// Run from the repository root:  go run ./testdata/gen
+// Run from the repository root:
+//
+//	go run testdata/gen/main.go testdata/gen/bench.go
 package main
 
 import (
@@ -69,9 +70,9 @@ func main() {
 	}
 
 	// OGG stub: enough header for tools to recognize the type; content is
-	// irrelevant because v0.1 passes audio through byte-for-byte.
+	// irrelevant because v0.1 passes audio through byte-for-byte (and v0.2
+	// only re-encodes under the explicit --audio-ffmpeg opt-in).
 	ogg := append([]byte("OggS\x00\x02\x00\x00\x00\x00\x00\x00\x00\x00"), make([]byte, 64)...)
-	ogg = append([]byte(nil), ogg...)
 	for _, path := range []string{
 		"testdata/packs/rich/sounds/custom/pop.ogg",
 	} {
@@ -110,16 +111,21 @@ func main() {
 	fmt.Println("fixture binaries written")
 }
 
-// genBenchmarkPacks builds the two measurement packs used for the honest
-// README numbers: a JSON-heavy pack (author-formatted registries, entities,
-// UI, animations) and a PNG-heavy pack (BestSpeed-encoded sprites, the way
-// community tools save PNGs). Everything is deterministic.
+// genBenchmarkPacks builds the measurement packs used for the honest
+// README numbers: a JSON-heavy pack (author-formatted registries,
+// entities, UI, animations), a PNG-heavy pack (BestSpeed-encoded sprites,
+// the way community tools save PNGs), and a UI-palette pack (low-color
+// sprites, the v0.2 lossless palette conversion's showcase). Everything
+// is deterministic.
 func genBenchmarkPacks(root string) error {
 	if err := genJSONHeavy(filepath.Join(root, "testdata/benchmarks/json_heavy")); err != nil {
 		return fmt.Errorf("json_heavy: %w", err)
 	}
 	if err := genPNGHeavy(filepath.Join(root, "testdata/benchmarks/png_heavy")); err != nil {
 		return fmt.Errorf("png_heavy: %w", err)
+	}
+	if err := genUIPalette(filepath.Join(root, "testdata/benchmarks/ui_palette")); err != nil {
+		return fmt.Errorf("ui_palette: %w", err)
 	}
 	return nil
 }

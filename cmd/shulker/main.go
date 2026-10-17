@@ -21,7 +21,7 @@ import (
 
 // version is set by the Makefile/CI via -ldflags; dev default for source
 // builds.
-var version = "0.1.0"
+var version = "0.2.0"
 
 const usageText = `shulker — Bedrock pack squasher & obfuscator
 

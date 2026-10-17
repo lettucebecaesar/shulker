@@ -12,7 +12,7 @@ import (
 type PNGOptions struct {
 	// Quantize enables lossy median-cut quantization (opt-in: it changes
 	// pixels). v0.2 guards it to binary-alpha (fully opaque or fully
-	// transparent) images only Ã¢â‚¬â€ partial transparency is left alone.
+	// transparent) images only — partial transparency is left alone.
 	Quantize bool
 	// QuantizeColors is the palette size target for quantization
 	// (2..256; 0 means 256).
@@ -26,15 +26,15 @@ type PNGOptions struct {
 // Candidates considered:
 //   - a straight BestCompression re-encode of the decoded image,
 //   - a LOSSLESS conversion to an indexed (palette) PNG when the image uses
-//     at most 256 distinct colors Ã¢â‚¬â€ pixel-identical, often dramatically
+//     at most 256 distinct colors — pixel-identical, often dramatically
 //     smaller for UI-style art,
 //   - with Quantize enabled: a lossy median-cut quantized palette PNG
-//     (pixels change Ã¢â‚¬â€ that is what opt-in means).
+//     (pixels change — that is what opt-in means).
 //
 // What changes intentionally on the lossless paths: interlacing is dropped
 // (Adam7 costs bytes and the engine does not need it) and ancillary chunks
 // Go does not model (iCCP profiles, tEXt metadata, some gAMA/sRGB data)
-// disappear Ã¢â‚¬â€ the engine renders pixels, not profiles.
+// disappear — the engine renders pixels, not profiles.
 //
 // NO quantization by default (v0.1 ethos preserved); lossy is always opt-in.
 func OptimizePNG(data []byte) (out []byte, reencoded bool, err error) {
@@ -191,7 +191,7 @@ func quantize(img *image.NRGBA, target int) (*image.Paletted, bool) {
 		}
 	}
 	if len(colors) <= target {
-		// Nothing to reduce Ã¢â‚¬â€ the lossless palette path already wins.
+		// Nothing to reduce — the lossless palette path already wins.
 		return nil, false
 	}
 
@@ -327,7 +327,7 @@ func widestChannel(colors []rgbaKey) int {
 	return best
 }
 
-// sortBox orders colors in place along one channel (insertion sort Ã¢â‚¬â€ the
+// sortBox orders colors in place along one channel (insertion sort — the
 // per-box color counts are small and this keeps the algorithm free of
 // sort.Slice's non-deterministic tie-breaking).
 func sortBox(colors []rgbaKey, channel int) {
