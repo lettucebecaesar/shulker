@@ -71,11 +71,25 @@ func SquashPack(p *pack.Pack, opts Options) (*Result, error) {
 			formatFindings(res.Check.Errors()))
 	}
 
-	// 2. Transform (with optional PNG cache).
+	// 2. Transform (with optional PNG cache). Cache profiles pin the exact
+	// transform definition per pass so a cached result can never describe
+	// different behavior than the code would run.
 	topts := opts.Transforms
 	if topts.PNGOptimize && opts.UseCache {
 		pngFn := topts.PNG
-		topts.PNG = makeCachedPNG(pngFn, opts.CacheDir)
+		if pngFn == nil {
+			qopts := transform.PNGOptions{Quantize: topts.PNGQuantize, QuantizeColors: topts.QuantizeColors}
+			pngFn = func(data []byte) ([]byte, bool, error) { return transform.OptimizePNGWith(data, qopts) }
+		}
+		profile := fmt.Sprintf("v2:q=%t:c=%d", topts.PNGQuantize, topts.QuantizeColors)
+		topts.PNG = makeCachedPNG(profile, pngFn, opts.CacheDir)
+	}
+	if topts.PNGOptimizeOverrides && opts.UseCache {
+		verifyFn := topts.PNGVerify
+		if verifyFn == nil {
+			verifyFn = transform.OptimizePNGLosslessVerified
+		}
+		topts.PNGVerify = makeCachedPNG("v2:lossless-verified", verifyFn, opts.CacheDir)
 	}
 	tres, err := transform.Run(p, docs, gIn, topts)
 	if err != nil {
@@ -140,9 +154,9 @@ func joinLines(lines []string) string {
 	return out
 }
 
-// makeCachedPNG wraps a PNG transform (defaulting to transform.OptimizePNG)
-// with the content-addressed cache.
-func makeCachedPNG(pngFn func(data []byte) ([]byte, bool, error), dir string) func([]byte) ([]byte, bool, error) {
+// makeCachedPNG wraps a PNG transform with the content-addressed cache.
+// profile pins the transform definition (see cache.PNGKey).
+func makeCachedPNG(profile string, pngFn func(data []byte) ([]byte, bool, error), dir string) func([]byte) ([]byte, bool, error) {
 	if pngFn == nil {
 		pngFn = transform.OptimizePNG
 	}
@@ -151,7 +165,7 @@ func makeCachedPNG(pngFn func(data []byte) ([]byte, bool, error), dir string) fu
 		return pngFn
 	}
 	return func(data []byte) ([]byte, bool, error) {
-		key := cache.PNGKey(data)
+		key := cache.PNGKey(profile, data)
 		if out, changed, ok := c.Get(key); ok {
 			return out, changed, nil
 		}

@@ -120,8 +120,10 @@ func (c *Cache) path(key string) string {
 	return filepath.Join(c.dir, key[:2], key[2:])
 }
 
-// PNGKey is the cache key for the PNG transform. "v1" pins the transform
-// definition: bump it whenever the re-encode behavior changes.
-func PNGKey(data []byte) string {
-	return Key("png-optimize", "v1", HashBytes(data))
+// PNGKey is the cache key for the PNG transform. profile pins the exact
+// transform definition (pass + options); change it whenever the re-encode
+// behavior changes, so cached entries can never describe a different
+// transform than the code would run.
+func PNGKey(profile string, data []byte) string {
+	return Key("png-optimize", profile, HashBytes(data))
 }

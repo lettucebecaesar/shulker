@@ -40,6 +40,11 @@ Squash flags:
   --no-rename-identdirs  keep entity/geometry/animation/controller paths
   --no-minify            don't minify JSON
   --no-png               don't re-encode PNGs
+  --png-quantize         LOSSY: quantize binary-alpha PNGs to <=256 colors
+                         (opt-in; changes pixels; --png-quantize-colors N)
+  --png-optimize-overrides  re-encode override textures (vanilla paths,
+                         unreferenced, blocked) with pixel-verified lossless
+                         encoding; paths and pixels stay, bytes shrink
   --workers N           parallel PNG workers (default 8)
   --out-map FILE         mapping file to write (default <out>.map.json)
   --report FILE          machine-readable JSON report
@@ -146,9 +151,10 @@ func reorderArgs(args []string, valueFlags map[string]bool) (flags, rest []strin
 
 // squashValueFlags are the squash flags that take a separate value.
 var squashValueFlags = map[string]bool{
-	"--out-map": true,
-	"--report":  true,
-	"--workers": true,
+	"--out-map":             true,
+	"--report":              true,
+	"--workers":             true,
+	"--png-quantize-colors": true,
 }
 
 // ---------------------------------------------------------------- squash
@@ -164,6 +170,9 @@ func cmdSquash(args []string) {
 	noRenameIdentDirs := fs.Bool("no-rename-identdirs", false, "keep entity/geometry/animation paths")
 	noMinify := fs.Bool("no-minify", false, "don't minify JSON")
 	noPNG := fs.Bool("no-png", false, "don't re-encode PNGs")
+	pngQuantize := fs.Bool("png-quantize", false, "LOSSY: quantize binary-alpha PNGs to <=256 colors (opt-in; changes pixels)")
+	quantizeColors := fs.Int("png-quantize-colors", 256, "palette size target for --png-quantize (2..256)")
+	pngOverrides := fs.Bool("png-optimize-overrides", false, "re-encode override textures (vanilla paths etc.) with pixel-verified lossless encoding")
 	noCache := fs.Bool("no-cache", false, "disable the transform cache")
 	workers := fs.Int("workers", 8, "parallel PNG workers")
 	quiet := fs.Bool("q", false, "quiet")
@@ -195,6 +204,9 @@ func cmdSquash(args []string) {
 	opts.Transforms.RenameIdentDirs = !*noRenameIdentDirs
 	opts.Transforms.Minify = !*noMinify
 	opts.Transforms.PNGOptimize = !*noPNG
+	opts.Transforms.PNGQuantize = *pngQuantize
+	opts.Transforms.QuantizeColors = *quantizeColors
+	opts.Transforms.PNGOptimizeOverrides = *pngOverrides
 	opts.Transforms.Workers = *workers
 	opts.UseCache = !*noCache
 
@@ -223,8 +235,15 @@ func cmdSquash(args []string) {
 	if !*quiet {
 		sizes.Render(os.Stdout)
 		fmt.Printf("\n  output:   %s\n  mapping:  %s\n", out, *outMap)
-		fmt.Printf("  renamed %d files, rewrote %d references, re-encoded %d PNGs\n",
+		fmt.Printf("  renamed %d files, rewrote %d references, re-encoded %d PNGs",
 			len(res.Transform.Renames), len(res.Transform.Rewrites), len(res.Transform.PNGOptimized))
+		if len(res.Transform.OverridesOptimized) > 0 {
+			fmt.Printf(" (%d of them vanilla-override textures, pixel-verified)", len(res.Transform.OverridesOptimized))
+		}
+		fmt.Println()
+		if *pngQuantize {
+			fmt.Println("  note: --png-quantize is LOSSY — quantized textures render approximated colors")
+		}
 		printWarnings(res.Warnings(), *quiet)
 	}
 	if *reportFile != "" {
@@ -422,21 +441,30 @@ func runRegolith(args []string) {
 		Transforms: transform.DefaultOptions(),
 		Generator:  "shulker/" + version,
 	}
-	applySettings := func(key string, dst *bool) {
+	// Regolith settings use no-* keys: {"no-minify": true} must DISABLE
+	// the pass, so the value is negated on assignment.
+	applyNoSetting := func(key string, dst *bool) {
 		if v, ok := settings[key]; ok {
 			if b, ok := v.(bool); ok {
-				*dst = b
+				*dst = !b
 			}
 		}
 	}
 	if v, ok := settings["no-rename"].(bool); ok && v {
 		opts.Transforms = opts.Transforms.WithRenameDisabled()
 	}
-	applySettings("no-rename-textures", &opts.Transforms.RenameTextures)
-	applySettings("no-rename-sounds", &opts.Transforms.RenameSounds)
-	applySettings("no-rename-identdirs", &opts.Transforms.RenameIdentDirs)
-	applySettings("no-minify", &opts.Transforms.Minify)
-	applySettings("no-png", &opts.Transforms.PNGOptimize)
+	applyNoSetting("no-rename-textures", &opts.Transforms.RenameTextures)
+	applyNoSetting("no-rename-sounds", &opts.Transforms.RenameSounds)
+	applyNoSetting("no-rename-identdirs", &opts.Transforms.RenameIdentDirs)
+	applyNoSetting("no-minify", &opts.Transforms.Minify)
+	applyNoSetting("no-png", &opts.Transforms.PNGOptimize)
+	applyNoSetting("png-optimize-overrides", &opts.Transforms.PNGOptimizeOverrides)
+	if v, ok := settings["png-quantize"].(bool); ok {
+		opts.Transforms.PNGQuantize = v
+	}
+	if v, ok := settings["png-quantize-colors"].(float64); ok && v >= 2 {
+		opts.Transforms.QuantizeColors = int(v)
+	}
 	opts.UseCache = true
 	if v, ok := settings["no-cache"].(bool); ok && v {
 		opts.UseCache = false

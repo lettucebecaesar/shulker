@@ -32,6 +32,13 @@ type Plan struct {
 	// provably pack-internal: these are the only images v0.1 re-encodes.
 	// Vanilla-override and unreferenced textures keep their bytes.
 	PNGEligible map[string]bool
+
+	// OverridePNGEligible lists textures the default PNG pass skips
+	// (vanilla overrides, deny-listed paths, blocker-locked or
+	// unreferenced assets). They are re-encodable only under the explicit
+	// --png-optimize-overrides opt-in, which is pixel-verified and
+	// lossless-only.
+	OverridePNGEligible map[string]bool
 }
 
 // Planner runs the conservative v0.1 rename policy.
@@ -53,7 +60,11 @@ type Planner struct {
 // PlanRenames computes the rename plan over a pack + graph.
 func PlanRenames(p *pack.Pack, g *graph.Graph, opts Options) *Plan {
 	pl := &Planner{opts: opts}
-	plan := &Plan{SkipReasons: map[string]string{}, PNGEligible: map[string]bool{}}
+	plan := &Plan{
+		SkipReasons:         map[string]string{},
+		PNGEligible:         map[string]bool{},
+		OverridePNGEligible: map[string]bool{},
+	}
 
 	taken := map[string]bool{} // target paths already assigned
 	for _, f := range p.Files {
@@ -143,7 +154,13 @@ func renameBlocked(p string) string {
 func (pl *Planner) planTextureGroup(g *graph.Graph, members []string, color string, set *graph.TextureSet, plan *Plan, taken map[string]bool, counter *int) {
 	// Eligibility first — it is a property of the input pack and is shared
 	// by the rename AND png-optimize passes.
+	eligibleForOverrideOptIn := func() {
+		for _, m := range members {
+			plan.OverridePNGEligible[m] = true
+		}
+	}
 	if reason := renameBlocked(color); reason != "" {
+		eligibleForOverrideOptIn()
 		for _, m := range members {
 			plan.SkipReasons[m] = reason
 		}
@@ -153,6 +170,7 @@ func (pl *Planner) planTextureGroup(g *graph.Graph, members []string, color stri
 	blockers := map[string]string{}
 	for _, m := range members {
 		if reason := renameBlocked(m); reason != "" {
+			eligibleForOverrideOptIn()
 			for _, mm := range members {
 				plan.SkipReasons[mm] = "PBR set member locked: " + reason
 			}
@@ -170,12 +188,14 @@ func (pl *Planner) planTextureGroup(g *graph.Graph, members []string, color stri
 		}
 	}
 	if colorEdges == 0 {
+		eligibleForOverrideOptIn()
 		for _, m := range members {
 			plan.SkipReasons[m] = "no pack-internal reference found (may be a vanilla override): left untouched"
 		}
 		return
 	}
 	if len(blockers) > 0 {
+		eligibleForOverrideOptIn()
 		for _, m := range members {
 			if why, ok := blockers[m]; ok {
 				plan.SkipReasons[m] = why

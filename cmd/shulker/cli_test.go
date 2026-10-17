@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -9,17 +10,38 @@ import (
 	"testing"
 )
 
-// buildBinary compiles the real CLI so these tests exercise argv parsing,
+// The tests share one binary build (TestMain) and drive the real compiled
 // file I/O, exit codes, and the Regolith exe-filter invocation shape â€” the
 // exact surfaces humans and Regolith touch.
+var (
+	binPath string
+	binErr  error
+)
+
+func TestMain(m *testing.M) {
+	dir, err := os.MkdirTemp("", "shulker-cli-test-*")
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
+		os.Exit(1)
+	}
+	binPath = filepath.Join(dir, "shulker-test"+exeSuffix())
+	out, err := exec.Command("go", "build", "-o", binPath, ".").CombinedOutput()
+	if err != nil {
+		binErr = fmt.Errorf("go build: %v\n%s", err, out)
+	}
+	code := m.Run()
+	_ = os.RemoveAll(dir)
+	os.Exit(code)
+}
+
+// buildBinary returns the shared CLI binary, built once per test run so
+// the suite stays fast while still exercising the real compiled artifact.
 func buildBinary(t *testing.T) string {
 	t.Helper()
-	bin := filepath.Join(t.TempDir(), "shulker-test"+exeSuffix())
-	cmd := exec.Command("go", "build", "-o", bin, ".")
-	if out, err := cmd.CombinedOutput(); err != nil {
-		t.Fatalf("go build: %v\n%s", err, out)
+	if binErr != nil {
+		t.Fatal(binErr)
 	}
-	return bin
+	return binPath
 }
 
 func exeSuffix() string {
@@ -251,6 +273,68 @@ func TestCLIFlagsAfterPositionals(t *testing.T) {
 	}
 	if _, err := os.Stat(filepath.Join(tmp, "custom.map.json")); err != nil {
 		t.Errorf("--out-map after positionals not honored: %v", err)
+	}
+}
+
+// Regolith settings with no-* keys must DISABLE the corresponding pass
+// (v0.1 bug: they used to enable it — this test locks the fix).
+func TestCLIRegolithSettingsSemantics(t *testing.T) {
+	bin := buildBinary(t)
+	stage := t.TempDir()
+	rp := filepath.Join(stage, "RP")
+	richSrc, err := filepath.Abs(filepath.Join("..", "..", "testdata", "packs", "rich"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := copyTree(richSrc, rp); err != nil {
+		t.Fatal(err)
+	}
+	r := runBin(t, bin, stage, []string{
+		"FILTER_DIR=" + stage,
+		"ROOT_DIR=" + stage,
+	}, `{"no-minify":true,"no-rename-sounds":true}`, "regolith")
+	if r.exitCode != 0 {
+		t.Fatalf("regolith mode failed (%d):\n%s\n%s", r.exitCode, r.stdout, r.stderr)
+	}
+	blocks, err := os.ReadFile(filepath.Join(rp, "blocks.json"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(string(blocks), "\n") {
+		t.Error(`{"no-minify":true} must disable minification`)
+	}
+	// no-rename-sounds: the sound file keeps its path.
+	if _, err := os.Stat(filepath.Join(rp, "sounds", "custom", "pop.ogg")); err != nil {
+		t.Errorf("no-rename-sounds must keep sound paths: %v", err)
+	}
+}
+
+func TestCLIPNGQuantizeFlags(t *testing.T) {
+	bin := buildBinary(t)
+	rich, err := filepath.Abs(filepath.Join("..", "..", "testdata", "packs", "rich"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	tmp := t.TempDir()
+	out := filepath.Join(tmp, "q.mcpack")
+	// The lossy flag is opt-in and prints its note; overrides flag re-encodes
+	// vanilla overrides with pixel verification. Both together must run the
+	// whole pipeline cleanly.
+	r := runBin(t, bin, tmp, nil, "squash", rich, out, "--png-quantize",
+		"--png-quantize-colors", "128", "--png-optimize-overrides", "--no-cache")
+	if r.exitCode != 0 {
+		t.Fatalf("squash with png flags failed (%d):\n%s\n%s", r.exitCode, r.stdout, r.stderr)
+	}
+	if !strings.Contains(r.stdout, "LOSSY") {
+		t.Errorf("quantize note missing:\n%s", r.stdout)
+	}
+	if _, err := os.Stat(out); err != nil {
+		t.Fatal(err)
+	}
+	// The squashed pack still validates.
+	r = runBin(t, bin, tmp, nil, "check", out)
+	if r.exitCode != 0 {
+		t.Errorf("check on quantized pack failed:\n%s\n%s", r.stdout, r.stderr)
 	}
 }
 

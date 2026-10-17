@@ -20,6 +20,18 @@ type Options struct {
 	// PNGOptimize re-encodes pack-internal textures at best compression,
 	// keep-if-smaller.
 	PNGOptimize bool
+	// PNGQuantize additionally applies LOSSY median-cut quantization
+	// (opt-in: pixels change). Binary-alpha images only; partial
+	// transparency is left alone.
+	PNGQuantize bool
+	// QuantizeColors is the palette size target for quantization
+	// (2..256; 0 = 256).
+	QuantizeColors int
+	// PNGOptimizeOverrides re-encodes the textures the default pass
+	// deliberately leaves alone — vanilla overrides, deny-listed,
+	// blocker-locked, unreferenced — with pixel-verified LOSSLESS
+	// re-encoding (paths stay, pixels stay, only bytes shrink).
+	PNGOptimizeOverrides bool
 
 	// Granular rename toggles. Defaults in DefaultOptions.
 	RenameTextures  bool
@@ -29,13 +41,16 @@ type Options struct {
 	// Workers bounds concurrent PNG re-encoding (CPU-bound).
 	Workers int
 
-	// PNG is the re-encode function; overridable for caching and tests.
-	// nil means OptimizePNG.
+	// PNG is the re-encode function for the default pass; overridable for
+	// caching and tests. nil means OptimizePNGWith with the options above.
 	PNG func(data []byte) (out []byte, reencoded bool, err error)
+	// PNGVerify is the pixel-verified re-encoder for the overrides pass;
+	// nil means OptimizePNGLosslessVerified.
+	PNGVerify func(data []byte) (out []byte, reencoded bool, err error)
 }
 
 // DefaultOptions is the shulker squash default: everything on, conservatism
-// always.
+// always. Quantization stays OFF by default — lossy is opt-in.
 func DefaultOptions() Options {
 	return Options{
 		Minify:          true,
@@ -44,7 +59,7 @@ func DefaultOptions() Options {
 		RenameTextures:  true,
 		RenameSounds:    true,
 		RenameIdentDirs: true,
-		Workers:         0, // 0 = runtime.NumCPU
+		Workers:         0, // 0 = sensible default fan-out
 	}
 }
 
@@ -66,10 +81,13 @@ type Result struct {
 	Rewrites []graph.Rewrite
 
 	// PNGOptimized maps ORIGINAL paths that were re-encoded (and actually
-	// got smaller) to true. PNGPassthrough lists undecodable PNGs that
-	// were left byte-identical.
-	PNGOptimized   map[string]bool
-	PNGPassthrough []string
+	// got smaller) to true — including overrides re-encoded under the
+	// --png-optimize-overrides opt-in. OverridesOptimized marks exactly
+	// that opt-in subset. PNGPassthrough lists undecodable PNGs that were
+	// left byte-identical.
+	PNGOptimized       map[string]bool
+	OverridesOptimized map[string]bool
+	PNGPassthrough     []string
 
 	// SkipReasons explains every rename candidate that stayed put.
 	SkipReasons map[string]string
@@ -86,8 +104,9 @@ type Result struct {
 // reference strings cannot corrupt the diff baseline.
 func Run(p *pack.Pack, inDocs map[string]jsonx.Value, inG *graph.Graph, opts Options) (*Result, error) {
 	res := &Result{
-		PNGOptimized: map[string]bool{},
-		SkipReasons:  map[string]string{},
+		PNGOptimized:       map[string]bool{},
+		OverridesOptimized: map[string]bool{},
+		SkipReasons:        map[string]string{},
 	}
 
 	// 1. Plan renames against the pristine input graph.
@@ -115,7 +134,10 @@ func Run(p *pack.Pack, inDocs map[string]jsonx.Value, inG *graph.Graph, opts Opt
 	// final assembly is deterministic).
 	pngFn := opts.PNG
 	if pngFn == nil {
-		pngFn = OptimizePNG
+		qopts := PNGOptions{Quantize: opts.PNGQuantize, QuantizeColors: opts.QuantizeColors}
+		pngFn = func(data []byte) ([]byte, bool, error) {
+			return OptimizePNGWith(data, qopts)
+		}
 	}
 	pngOut := map[string][]byte{}
 	pngReencoded := map[string]bool{}
@@ -125,48 +147,27 @@ func Run(p *pack.Pack, inDocs map[string]jsonx.Value, inG *graph.Graph, opts Opt
 			paths = append(paths, path)
 		}
 		sort.Strings(paths)
-		workers := opts.Workers
-		if workers <= 0 {
-			workers = 8
+		runPNGFanOut(p, paths, pngFn, opts.Workers, pngOut, pngReencoded, &res.PNGPassthrough, &res.Warnings)
+	}
+	// 4b. The opt-in overrides pass: textures the default pass leaves
+	// alone, re-encoded with pixel-verified lossless encoding only.
+	if opts.PNGOptimizeOverrides {
+		verifyFn := opts.PNGVerify
+		if verifyFn == nil {
+			verifyFn = OptimizePNGLosslessVerified
 		}
-		sem := make(chan struct{}, workers)
-		var mu sync.Mutex
-		var wg sync.WaitGroup
-		var undecodable []string
-		for _, path := range paths {
-			f, ok := p.File(path)
-			if !ok || pack.Ext(path) != ".png" {
-				continue
-			}
-			wg.Add(1)
-			go func(path string, data []byte) {
-				defer wg.Done()
-				sem <- struct{}{}
-				defer func() { <-sem }()
-				out, changed, err := pngFn(data)
-				if err != nil {
-					mu.Lock()
-					undecodable = append(undecodable, path)
-					mu.Unlock()
-					return
-				}
-				if changed {
-					mu.Lock()
-					pngOut[path] = out
-					pngReencoded[path] = true
-					mu.Unlock()
-				}
-			}(path, f.Data)
+		var paths []string
+		for path := range plan.OverridePNGEligible {
+			paths = append(paths, path)
 		}
-		wg.Wait()
-		sort.Strings(undecodable)
-		res.PNGPassthrough = undecodable
-		for _, path := range undecodable {
-			res.Warnings = append(res.Warnings, pack.Finding{
-				Severity: pack.SeverityWarning,
-				Path:     path,
-				Msg:      "PNG could not be decoded; passed through unchanged",
-			})
+		sort.Strings(paths)
+		overOut := map[string][]byte{}
+		overReencoded := map[string]bool{}
+		runPNGFanOut(p, paths, verifyFn, opts.Workers, overOut, overReencoded, &res.PNGPassthrough, &res.Warnings)
+		for path := range overReencoded {
+			pngOut[path] = overOut[path]
+			pngReencoded[path] = true
+			res.OverridesOptimized[path] = true
 		}
 	}
 
@@ -214,6 +215,54 @@ func Run(p *pack.Pack, inDocs map[string]jsonx.Value, inG *graph.Graph, opts Opt
 		res.PNGOptimized[path] = true
 	}
 	return res, nil
+}
+
+// runPNGFanOut applies fn to every pack .png in paths with bounded
+// parallelism, collecting results deterministically (keyed by path).
+func runPNGFanOut(p *pack.Pack, paths []string, fn func([]byte) ([]byte, bool, error), workers int,
+	out map[string][]byte, reencoded map[string]bool, passthrough *[]string, warnings *[]pack.Finding) {
+	if workers <= 0 {
+		workers = 8
+	}
+	sem := make(chan struct{}, workers)
+	var mu sync.Mutex
+	var wg sync.WaitGroup
+	var undecodable []string
+	for _, path := range paths {
+		f, ok := p.File(path)
+		if !ok || pack.Ext(path) != ".png" {
+			continue
+		}
+		wg.Add(1)
+		go func(path string, data []byte) {
+			defer wg.Done()
+			sem <- struct{}{}
+			defer func() { <-sem }()
+			encoded, changed, err := fn(data)
+			if err != nil {
+				mu.Lock()
+				undecodable = append(undecodable, path)
+				mu.Unlock()
+				return
+			}
+			if changed {
+				mu.Lock()
+				out[path] = encoded
+				reencoded[path] = true
+				mu.Unlock()
+			}
+		}(path, f.Data)
+	}
+	wg.Wait()
+	sort.Strings(undecodable)
+	*passthrough = append(*passthrough, undecodable...)
+	for _, path := range undecodable {
+		*warnings = append(*warnings, pack.Finding{
+			Severity: pack.SeverityWarning,
+			Path:     path,
+			Msg:      "PNG could not be decoded; passed through unchanged",
+		})
+	}
 }
 
 // normalizeNumbers rewrites every number literal in place through the

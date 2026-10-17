@@ -15,14 +15,18 @@ func TestPutGetRoundTrip(t *testing.T) {
 	if _, _, ok := c.Get(Key("missing")); ok {
 		t.Error("empty cache must miss")
 	}
-	c.Put(PNGKey([]byte("fakepng")), true, []byte("optimized"))
-	data, changed, ok := c.Get(PNGKey([]byte("fakepng")))
+	c.Put(PNGKey("v1", []byte("fakepng")), true, []byte("optimized"))
+	data, changed, ok := c.Get(PNGKey("v1", []byte("fakepng")))
 	if !ok || !changed || !bytes.Equal(data, []byte("optimized")) {
 		t.Errorf("Get = %q %v %v", data, changed, ok)
 	}
 	// Different content, different key.
-	if _, _, ok := c.Get(PNGKey([]byte("otherpng"))); ok {
+	if _, _, ok := c.Get(PNGKey("v1", []byte("otherpng"))); ok {
 		t.Error("wrong content must miss")
+	}
+	// Different transform profile, different key.
+	if _, _, ok := c.Get(PNGKey("v2", []byte("fakepng"))); ok {
+		t.Error("different profile must miss")
 	}
 }
 
