@@ -1,0 +1,16 @@
+# Binaries
+/shulker
+/shulker.exe
+/bin/
+/dist/
+
+# Test and coverage artifacts
+*.out
+*.test
+coverage.*
+
+# Editor and OS noise
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
