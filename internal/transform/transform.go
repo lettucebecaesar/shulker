@@ -2,6 +2,7 @@ package transform
 
 import (
 	"sort"
+	"strings"
 	"sync"
 
 	"github.com/shulker-tools/shulker/internal/graph"
@@ -32,6 +33,16 @@ type Options struct {
 	// blocker-locked, unreferenced — with pixel-verified LOSSLESS
 	// re-encoding (paths stay, pixels stay, only bytes shrink).
 	PNGOptimizeOverrides bool
+
+	// AudioFFmpeg re-encodes pack-internal OGG sounds through ffmpeg's
+	// Vorbis encoder (opt-in, keep-if-smaller; vanilla-path override
+	// audio keeps its exact bytes). Requires ffmpeg on PATH.
+	AudioFFmpeg bool
+	// AudioQuality is the Vorbis quality level (-qscale:a, 0..10).
+	AudioQuality int
+	// AudioFn overrides the audio re-encoder (tests, caching). nil means
+	// the default ffmpeg hook.
+	AudioFn func(data []byte, quality int) (out []byte, smaller bool, err error)
 
 	// Granular rename toggles. Defaults in DefaultOptions.
 	RenameTextures  bool
@@ -89,6 +100,11 @@ type Result struct {
 	OverridesOptimized map[string]bool
 	PNGPassthrough     []string
 
+	// AudioTranscoded maps ORIGINAL paths of OGG sounds that were
+	// re-encoded (and got smaller) to true. Everything else — including
+	// vanilla-path override audio — keeps its exact bytes.
+	AudioTranscoded map[string]bool
+
 	// SkipReasons explains every rename candidate that stayed put.
 	SkipReasons map[string]string
 
@@ -106,6 +122,7 @@ func Run(p *pack.Pack, inDocs map[string]jsonx.Value, inG *graph.Graph, opts Opt
 	res := &Result{
 		PNGOptimized:       map[string]bool{},
 		OverridesOptimized: map[string]bool{},
+		AudioTranscoded:    map[string]bool{},
 		SkipReasons:        map[string]string{},
 	}
 
@@ -171,6 +188,65 @@ func Run(p *pack.Pack, inDocs map[string]jsonx.Value, inG *graph.Graph, opts Opt
 		}
 	}
 
+	// 4c. The opt-in audio pass: pack-internal OGG sounds through the
+	// configured encoder (default: ffmpeg hook), keep-if-smaller.
+	audioOut := map[string][]byte{}
+	if opts.AudioFFmpeg {
+		audioFn := opts.AudioFn
+		if audioFn == nil {
+			audioFn = DefaultAudioFn
+		}
+		var paths []string
+		for path := range plan.AudioEligible {
+			if pack.Ext(path) == ".ogg" {
+				paths = append(paths, path)
+			}
+		}
+		sort.Strings(paths)
+		workers := opts.Workers
+		if workers <= 0 {
+			workers = 4 // transcoding bounds external processes
+		}
+		sem := make(chan struct{}, workers)
+		var mu sync.Mutex
+		var wg sync.WaitGroup
+		var missing []string
+		for _, path := range paths {
+			f, ok := p.File(path)
+			if !ok {
+				continue
+			}
+			wg.Add(1)
+			go func(path string, data []byte) {
+				defer wg.Done()
+				sem <- struct{}{}
+				defer func() { <-sem }()
+				out, smaller, err := audioFn(data, opts.AudioQuality)
+				if err != nil {
+					mu.Lock()
+					missing = append(missing, path+": "+err.Error())
+					mu.Unlock()
+					return
+				}
+				if smaller {
+					mu.Lock()
+					audioOut[path] = out
+					res.AudioTranscoded[path] = true
+					mu.Unlock()
+				}
+			}(path, f.Data)
+		}
+		wg.Wait()
+		if len(missing) > 0 {
+			sort.Strings(missing)
+			res.Warnings = append(res.Warnings, pack.Finding{
+				Severity: pack.SeverityWarning,
+				Path:     "sounds/",
+				Msg: "audio transcoding unavailable for some files — " +
+					"passed through unchanged: " + strings.Join(missing, "; "),
+			})
+		}
+	}
 	// 5. Materialize the output file set. Input paths map through the
 	// rename plan; JSON bytes come from the (rewritten, minified) working
 	// trees; PNG bytes from the optimization results; everything else is
@@ -203,6 +279,8 @@ func Run(p *pack.Pack, inDocs map[string]jsonx.Value, inG *graph.Graph, opts Opt
 				normalizeNumbers(tree)
 			}
 			out.Data = jsonx.Encode(tree)
+		} else if data, ok := audioOut[f.Path]; ok {
+			out.Data = data
 		} else if data, ok := pngOut[f.Path]; ok {
 			out.Data = data
 		}

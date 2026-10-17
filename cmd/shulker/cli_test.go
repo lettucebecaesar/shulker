@@ -338,6 +338,27 @@ func TestCLIPNGQuantizeFlags(t *testing.T) {
 	}
 }
 
+// --audio-ffmpeg without ffmpeg installed must degrade to passthrough with
+// a warning, never a crash or a failed squash.
+func TestCLIAudioFFmpegGraceful(t *testing.T) {
+	bin := buildBinary(t)
+	rich, err := filepath.Abs(filepath.Join("..", "..", "testdata", "packs", "rich"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	tmp := t.TempDir()
+	out := filepath.Join(tmp, "a.mcpack")
+	r := runBin(t, bin, tmp, []string{"PATH=" + t.TempDir()},
+		"squash", rich, out, "--audio-ffmpeg")
+	if r.exitCode != 0 {
+		t.Fatalf("squash --audio-ffmpeg must not fail without ffmpeg (%d):\n%s\n%s",
+			r.exitCode, r.stdout, r.stderr)
+	}
+	if !strings.Contains(r.stdout, "passed through unchanged") {
+		t.Errorf("expected the passthrough warning:\n%s", r.stdout)
+	}
+}
+
 func TestCLIUnknownCommandExitsUsage(t *testing.T) {
 	bin := buildBinary(t)
 	r := runBin(t, bin, t.TempDir(), nil, "frobnicate")

@@ -23,6 +23,10 @@ type TransformLog struct {
 	// re-encoded under the explicit --png-optimize-overrides opt-in.
 	// Without that flag, such textures must stay byte-identical.
 	OverridesOptimized map[string]bool
+	// AudioTranscoded lists pack-internal OGG sounds re-encoded under the
+	// explicit --audio-ffmpeg opt-in (original paths). Without that flag,
+	// all audio must stay byte-identical.
+	AudioTranscoded map[string]bool
 }
 
 // PostTransform proves the output pack is load-equivalent to the input:
@@ -120,11 +124,11 @@ func (r *Result) checkBytes(in, out *pack.Pack, renameMap map[string]string, log
 			to = m
 		}
 		// JSON gets the structural diff; everything else must be
-		// byte-identical unless it is a logged PNG re-encode.
+		// byte-identical unless it is a logged re-encode.
 		if pack.Ext(f.Path) == ".json" && f.Class != pack.ClassSubpack {
 			continue
 		}
-		if log.PNGOptimized[f.Path] {
+		if log.PNGOptimized[f.Path] || log.AudioTranscoded[f.Path] {
 			continue
 		}
 		of, ok := out.File(to)

@@ -307,6 +307,28 @@ func TestPostTransformCatchesDenyListReencode(t *testing.T) {
 	}
 }
 
+func TestPostTransformCatchesUnaccountedAudioChange(t *testing.T) {
+	in, inG := loadPack(t, fixturePath("rich"))
+	dir := copyDir(t, fixturePath("rich"))
+	target := filepath.Join(dir, filepath.FromSlash("sounds/custom/pop.ogg"))
+	if err := os.WriteFile(target, []byte("sneaky re-encode"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	out, outG := loadPack(t, dir)
+	// Without the log entry the validator must reject the byte change.
+	r := PostTransform(in, inG, out, outG, &TransformLog{})
+	if !hasErrorWith(r, "non-JSON file content changed") {
+		t.Errorf("unaccounted audio change must be caught, got: %+v", r.Errors())
+	}
+	// With the accounted entry it is accepted.
+	r = PostTransform(in, inG, out, outG, &TransformLog{
+		AudioTranscoded: map[string]bool{"sounds/custom/pop.ogg": true},
+	})
+	if hasErrorWith(r, "non-JSON file content changed") {
+		t.Errorf("accounted audio change must pass, got: %+v", r.Errors())
+	}
+}
+
 func TestMinimalPackChecksClean(t *testing.T) {
 	p, g := loadPack(t, fixturePath("minimal"))
 	r := Check(p, g)

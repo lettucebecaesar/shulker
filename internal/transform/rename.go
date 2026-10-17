@@ -39,6 +39,11 @@ type Plan struct {
 	// --png-optimize-overrides opt-in, which is pixel-verified and
 	// lossless-only.
 	OverridePNGEligible map[string]bool
+
+	// AudioEligible lists sound files (original paths) whose references
+	// are provably pack-internal: the only audio the opt-in --audio-ffmpeg
+	// pass may re-encode. Vanilla-path override audio keeps its bytes.
+	AudioEligible map[string]bool
 }
 
 // Planner runs the conservative v0.1 rename policy.
@@ -64,6 +69,7 @@ func PlanRenames(p *pack.Pack, g *graph.Graph, opts Options) *Plan {
 		SkipReasons:         map[string]string{},
 		PNGEligible:         map[string]bool{},
 		OverridePNGEligible: map[string]bool{},
+		AudioEligible:       map[string]bool{},
 	}
 
 	taken := map[string]bool{} // target paths already assigned
@@ -257,6 +263,8 @@ func (pl *Planner) planSoundFile(g *graph.Graph, file string, plan *Plan, taken 
 		plan.SkipReasons[file] = "no pack-internal reference found (may be a vanilla override): left untouched"
 		return
 	}
+	// Provably pack-internal sound: eligible for the opt-in audio pass.
+	plan.AudioEligible[file] = true
 	ext := path.Ext(file)
 	to := pl.freshName("sounds", ext, taken, counter) + ext
 	plan.Renames = append(plan.Renames, graph.Rename{From: file, To: to})

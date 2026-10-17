@@ -91,6 +91,30 @@ func SquashPack(p *pack.Pack, opts Options) (*Result, error) {
 		}
 		topts.PNGVerify = makeCachedPNG("v2:lossless-verified", verifyFn, opts.CacheDir)
 	}
+	if topts.AudioFFmpeg && opts.UseCache {
+		audioFn := topts.AudioFn
+		if audioFn == nil {
+			audioFn = transform.DefaultAudioFn
+		}
+		// The profile embeds the reported ffmpeg version: different builds
+		// can produce different bytes, so they must never share entries.
+		profile := fmt.Sprintf("v1:ffmpeg:%s:q=%d", transform.FFmpegVersion(), topts.AudioQuality)
+		quality := topts.AudioQuality
+		c, cerr := cache.New(opts.CacheDir, true)
+		if cerr == nil && c != nil {
+			topts.AudioFn = func(data []byte, _ int) ([]byte, bool, error) {
+				key := cache.Key("audio-transcode", profile, cache.HashBytes(data))
+				if out, smaller, ok := c.Get(key); ok {
+					return out, smaller, nil
+				}
+				out, smaller, err := audioFn(data, quality)
+				if err == nil {
+					c.Put(key, smaller, out)
+				}
+				return out, smaller, err
+			}
+		}
+	}
 	tres, err := transform.Run(p, docs, gIn, topts)
 	if err != nil {
 		return nil, fmt.Errorf("transform failed: %w", err)

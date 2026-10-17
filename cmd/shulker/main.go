@@ -173,6 +173,8 @@ func cmdSquash(args []string) {
 	pngQuantize := fs.Bool("png-quantize", false, "LOSSY: quantize binary-alpha PNGs to <=256 colors (opt-in; changes pixels)")
 	quantizeColors := fs.Int("png-quantize-colors", 256, "palette size target for --png-quantize (2..256)")
 	pngOverrides := fs.Bool("png-optimize-overrides", false, "re-encode override textures (vanilla paths etc.) with pixel-verified lossless encoding")
+	audioFFmpeg := fs.Bool("audio-ffmpeg", false, "re-encode pack-internal OGG audio through ffmpeg (opt-in, keep-if-smaller; requires ffmpeg)")
+	audioQuality := fs.Int("audio-quality", 4, "Vorbis quality for --audio-ffmpeg (-qscale:a, 0..10)")
 	noCache := fs.Bool("no-cache", false, "disable the transform cache")
 	workers := fs.Int("workers", 8, "parallel PNG workers")
 	quiet := fs.Bool("q", false, "quiet")
@@ -207,6 +209,8 @@ func cmdSquash(args []string) {
 	opts.Transforms.PNGQuantize = *pngQuantize
 	opts.Transforms.QuantizeColors = *quantizeColors
 	opts.Transforms.PNGOptimizeOverrides = *pngOverrides
+	opts.Transforms.AudioFFmpeg = *audioFFmpeg
+	opts.Transforms.AudioQuality = *audioQuality
 	opts.Transforms.Workers = *workers
 	opts.UseCache = !*noCache
 
