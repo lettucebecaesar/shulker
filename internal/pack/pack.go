@@ -311,6 +311,40 @@ func assemble(files []*File, source string, warnings []Finding) (*Pack, error) {
 	return p, nil
 }
 
+// FromFiles assembles a transformed file set into a Pack: classification,
+// ordering, indexing, and manifest validation run exactly as they do for
+// Load — the pipeline's output goes through the same rigor as its input.
+// Discovery (template detection, nested-prefix stripping) is intentionally
+// absent: transforms start from an already-loaded pack.
+func FromFiles(source string, files []*File) (*Pack, error) {
+	sort.Slice(files, func(i, j int) bool { return files[i].Path < files[j].Path })
+	p := &Pack{Source: source, Files: files}
+	p.byPath = make(map[string]*File, len(files))
+	p.byLower = make(map[string]*File, len(files))
+	for _, f := range files {
+		f.Class = Classify(f.Path)
+		if _, dup := p.byPath[f.Path]; dup {
+			return nil, fmt.Errorf("duplicate pack path %q in transformed file set", f.Path)
+		}
+		p.byPath[f.Path] = f
+		p.byLower[strings.ToLower(f.Path)] = f
+	}
+	mf, ok := p.byPath[ManifestPath]
+	if !ok {
+		return nil, &NotResourcePackError{
+			Reason: "transformed file set has no manifest.json",
+			Hint:   "the transform must never drop or rename the manifest",
+		}
+	}
+	m, mFindings := ParseManifest(mf.Data)
+	p.Manifest = m
+	p.Warnings = append(p.Warnings, mFindings...)
+	if HasErrors(mFindings) {
+		return nil, fmt.Errorf("transformed manifest.json is invalid: %s", joinFindings(mFindings))
+	}
+	return p, nil
+}
+
 // findManifest locates manifest.json at the root, or under exactly one
 // nested directory (the classic community-zip layout:
 // MyPack/manifest.json + MyPack/**).
