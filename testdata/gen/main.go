@@ -101,7 +101,26 @@ func main() {
 		os.Exit(1)
 	}
 
+	if err := genBenchmarkPacks(root); err != nil {
+		fmt.Fprintln(os.Stderr, "error:", err)
+		os.Exit(1)
+	}
+
 	fmt.Println("fixture binaries written")
+}
+
+// genBenchmarkPacks builds the two measurement packs used for the honest
+// README numbers: a JSON-heavy pack (author-formatted registries, entities,
+// UI, animations) and a PNG-heavy pack (BestSpeed-encoded sprites, the way
+// community tools save PNGs). Everything is deterministic.
+func genBenchmarkPacks(root string) error {
+	if err := genJSONHeavy(filepath.Join(root, "testdata/benchmarks/json_heavy")); err != nil {
+		return fmt.Errorf("json_heavy: %w", err)
+	}
+	if err := genPNGHeavy(filepath.Join(root, "testdata/benchmarks/png_heavy")); err != nil {
+		return fmt.Errorf("png_heavy: %w", err)
+	}
+	return nil
 }
 
 func repoRoot() (string, error) {

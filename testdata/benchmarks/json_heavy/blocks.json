@@ -1,0 +1,82 @@
+{
+	// block 0
+	"bench:block_00": {"sound": "stone", "textures": "bench.block_00"},
+	// block 1
+	"bench:block_01": {"sound": "stone", "textures": "bench.block_01"},
+	// block 2
+	"bench:block_02": {"sound": "stone", "textures": "bench.block_02"},
+	// block 3
+	"bench:block_03": {"sound": "stone", "textures": "bench.block_03"},
+	// block 4
+	"bench:block_04": {"sound": "stone", "textures": "bench.block_04"},
+	// block 5
+	"bench:block_05": {"sound": "stone", "textures": "bench.block_05"},
+	// block 6
+	"bench:block_06": {"sound": "stone", "textures": "bench.block_06"},
+	// block 7
+	"bench:block_07": {"sound": "stone", "textures": "bench.block_07"},
+	// block 8
+	"bench:block_08": {"sound": "stone", "textures": "bench.block_08"},
+	// block 9
+	"bench:block_09": {"sound": "stone", "textures": "bench.block_09"},
+	// block 10
+	"bench:block_10": {"sound": "stone", "textures": "bench.block_10"},
+	// block 11
+	"bench:block_11": {"sound": "stone", "textures": "bench.block_11"},
+	// block 12
+	"bench:block_12": {"sound": "stone", "textures": "bench.block_12"},
+	// block 13
+	"bench:block_13": {"sound": "stone", "textures": "bench.block_13"},
+	// block 14
+	"bench:block_14": {"sound": "stone", "textures": "bench.block_14"},
+	// block 15
+	"bench:block_15": {"sound": "stone", "textures": "bench.block_15"},
+	// block 16
+	"bench:block_16": {"sound": "stone", "textures": "bench.block_16"},
+	// block 17
+	"bench:block_17": {"sound": "stone", "textures": "bench.block_17"},
+	// block 18
+	"bench:block_18": {"sound": "stone", "textures": "bench.block_18"},
+	// block 19
+	"bench:block_19": {"sound": "stone", "textures": "bench.block_19"},
+	// block 20
+	"bench:block_20": {"sound": "stone", "textures": "bench.block_20"},
+	// block 21
+	"bench:block_21": {"sound": "stone", "textures": "bench.block_21"},
+	// block 22
+	"bench:block_22": {"sound": "stone", "textures": "bench.block_22"},
+	// block 23
+	"bench:block_23": {"sound": "stone", "textures": "bench.block_23"},
+	// block 24
+	"bench:block_24": {"sound": "stone", "textures": "bench.block_24"},
+	// block 25
+	"bench:block_25": {"sound": "stone", "textures": "bench.block_25"},
+	// block 26
+	"bench:block_26": {"sound": "stone", "textures": "bench.block_26"},
+	// block 27
+	"bench:block_27": {"sound": "stone", "textures": "bench.block_27"},
+	// block 28
+	"bench:block_28": {"sound": "stone", "textures": "bench.block_28"},
+	// block 29
+	"bench:block_29": {"sound": "stone", "textures": "bench.block_29"},
+	// block 30
+	"bench:block_30": {"sound": "stone", "textures": "bench.block_30"},
+	// block 31
+	"bench:block_31": {"sound": "stone", "textures": "bench.block_31"},
+	// block 32
+	"bench:block_32": {"sound": "stone", "textures": "bench.block_32"},
+	// block 33
+	"bench:block_33": {"sound": "stone", "textures": "bench.block_33"},
+	// block 34
+	"bench:block_34": {"sound": "stone", "textures": "bench.block_34"},
+	// block 35
+	"bench:block_35": {"sound": "stone", "textures": "bench.block_35"},
+	// block 36
+	"bench:block_36": {"sound": "stone", "textures": "bench.block_36"},
+	// block 37
+	"bench:block_37": {"sound": "stone", "textures": "bench.block_37"},
+	// block 38
+	"bench:block_38": {"sound": "stone", "textures": "bench.block_38"},
+	// block 39
+	"bench:block_39": {"sound": "stone", "textures": "bench.block_39"},
+}

@@ -1,0 +1,245 @@
+{
+	"format_version": "1.14.0",
+	"sound_definitions": {
+		"bench.hum_00": {
+			"category": "ambient",
+			"sounds": [
+				{ "name": "sounds/custom/hum_00_0", "volume": 0.520, "pitch": 1.10 },
+				{ "name": "sounds/custom/hum_00_1", "volume": 0.531, "pitch": 1.20 },
+				{ "name": "sounds/custom/hum_00_2", "volume": 0.542, "pitch": 1.30 },
+			],
+		},
+		"bench.hum_01": {
+			"category": "ambient",
+			"sounds": [
+				{ "name": "sounds/custom/hum_01_0", "volume": 0.621, "pitch": 1.10 },
+				{ "name": "sounds/custom/hum_01_1", "volume": 0.632, "pitch": 1.20 },
+				{ "name": "sounds/custom/hum_01_2", "volume": 0.643, "pitch": 1.30 },
+			],
+		},
+		"bench.hum_02": {
+			"category": "ambient",
+			"sounds": [
+				{ "name": "sounds/custom/hum_02_0", "volume": 0.722, "pitch": 1.10 },
+				{ "name": "sounds/custom/hum_02_1", "volume": 0.733, "pitch": 1.20 },
+				{ "name": "sounds/custom/hum_02_2", "volume": 0.744, "pitch": 1.30 },
+			],
+		},
+		"bench.hum_03": {
+			"category": "ambient",
+			"sounds": [
+				{ "name": "sounds/custom/hum_03_0", "volume": 0.823, "pitch": 1.10 },
+				{ "name": "sounds/custom/hum_03_1", "volume": 0.834, "pitch": 1.20 },
+				{ "name": "sounds/custom/hum_03_2", "volume": 0.845, "pitch": 1.30 },
+			],
+		},
+		"bench.hum_04": {
+			"category": "ambient",
+			"sounds": [
+				{ "name": "sounds/custom/hum_04_0", "volume": 0.524, "pitch": 1.10 },
+				{ "name": "sounds/custom/hum_04_1", "volume": 0.535, "pitch": 1.20 },
+				{ "name": "sounds/custom/hum_04_2", "volume": 0.546, "pitch": 1.30 },
+			],
+		},
+		"bench.hum_05": {
+			"category": "ambient",
+			"sounds": [
+				{ "name": "sounds/custom/hum_05_0", "volume": 0.625, "pitch": 1.10 },
+				{ "name": "sounds/custom/hum_05_1", "volume": 0.636, "pitch": 1.20 },
+				{ "name": "sounds/custom/hum_05_2", "volume": 0.647, "pitch": 1.30 },
+			],
+		},
+		"bench.hum_06": {
+			"category": "ambient",
+			"sounds": [
+				{ "name": "sounds/custom/hum_06_0", "volume": 0.726, "pitch": 1.10 },
+				{ "name": "sounds/custom/hum_06_1", "volume": 0.737, "pitch": 1.20 },
+				{ "name": "sounds/custom/hum_06_2", "volume": 0.748, "pitch": 1.30 },
+			],
+		},
+		"bench.hum_07": {
+			"category": "ambient",
+			"sounds": [
+				{ "name": "sounds/custom/hum_07_0", "volume": 0.827, "pitch": 1.10 },
+				{ "name": "sounds/custom/hum_07_1", "volume": 0.838, "pitch": 1.20 },
+				{ "name": "sounds/custom/hum_07_2", "volume": 0.849, "pitch": 1.30 },
+			],
+		},
+		"bench.hum_08": {
+			"category": "ambient",
+			"sounds": [
+				{ "name": "sounds/custom/hum_08_0", "volume": 0.528, "pitch": 1.10 },
+				{ "name": "sounds/custom/hum_08_1", "volume": 0.539, "pitch": 1.20 },
+				{ "name": "sounds/custom/hum_08_2", "volume": 0.540, "pitch": 1.30 },
+			],
+		},
+		"bench.hum_09": {
+			"category": "ambient",
+			"sounds": [
+				{ "name": "sounds/custom/hum_09_0", "volume": 0.629, "pitch": 1.10 },
+				{ "name": "sounds/custom/hum_09_1", "volume": 0.630, "pitch": 1.20 },
+				{ "name": "sounds/custom/hum_09_2", "volume": 0.641, "pitch": 1.30 },
+			],
+		},
+		"bench.hum_10": {
+			"category": "ambient",
+			"sounds": [
+				{ "name": "sounds/custom/hum_10_0", "volume": 0.720, "pitch": 1.10 },
+				{ "name": "sounds/custom/hum_10_1", "volume": 0.731, "pitch": 1.20 },
+				{ "name": "sounds/custom/hum_10_2", "volume": 0.742, "pitch": 1.30 },
+			],
+		},
+		"bench.hum_11": {
+			"category": "ambient",
+			"sounds": [
+				{ "name": "sounds/custom/hum_11_0", "volume": 0.821, "pitch": 1.10 },
+				{ "name": "sounds/custom/hum_11_1", "volume": 0.832, "pitch": 1.20 },
+				{ "name": "sounds/custom/hum_11_2", "volume": 0.843, "pitch": 1.30 },
+			],
+		},
+		"bench.hum_12": {
+			"category": "ambient",
+			"sounds": [
+				{ "name": "sounds/custom/hum_12_0", "volume": 0.522, "pitch": 1.10 },
+				{ "name": "sounds/custom/hum_12_1", "volume": 0.533, "pitch": 1.20 },
+				{ "name": "sounds/custom/hum_12_2", "volume": 0.544, "pitch": 1.30 },
+			],
+		},
+		"bench.hum_13": {
+			"category": "ambient",
+			"sounds": [
+				{ "name": "sounds/custom/hum_13_0", "volume": 0.623, "pitch": 1.10 },
+				{ "name": "sounds/custom/hum_13_1", "volume": 0.634, "pitch": 1.20 },
+				{ "name": "sounds/custom/hum_13_2", "volume": 0.645, "pitch": 1.30 },
+			],
+		},
+		"bench.hum_14": {
+			"category": "ambient",
+			"sounds": [
+				{ "name": "sounds/custom/hum_14_0", "volume": 0.724, "pitch": 1.10 },
+				{ "name": "sounds/custom/hum_14_1", "volume": 0.735, "pitch": 1.20 },
+				{ "name": "sounds/custom/hum_14_2", "volume": 0.746, "pitch": 1.30 },
+			],
+		},
+		"bench.hum_15": {
+			"category": "ambient",
+			"sounds": [
+				{ "name": "sounds/custom/hum_15_0", "volume": 0.825, "pitch": 1.10 },
+				{ "name": "sounds/custom/hum_15_1", "volume": 0.836, "pitch": 1.20 },
+				{ "name": "sounds/custom/hum_15_2", "volume": 0.847, "pitch": 1.30 },
+			],
+		},
+		"bench.hum_16": {
+			"category": "ambient",
+			"sounds": [
+				{ "name": "sounds/custom/hum_16_0", "volume": 0.526, "pitch": 1.10 },
+				{ "name": "sounds/custom/hum_16_1", "volume": 0.537, "pitch": 1.20 },
+				{ "name": "sounds/custom/hum_16_2", "volume": 0.548, "pitch": 1.30 },
+			],
+		},
+		"bench.hum_17": {
+			"category": "ambient",
+			"sounds": [
+				{ "name": "sounds/custom/hum_17_0", "volume": 0.627, "pitch": 1.10 },
+				{ "name": "sounds/custom/hum_17_1", "volume": 0.638, "pitch": 1.20 },
+				{ "name": "sounds/custom/hum_17_2", "volume": 0.649, "pitch": 1.30 },
+			],
+		},
+		"bench.hum_18": {
+			"category": "ambient",
+			"sounds": [
+				{ "name": "sounds/custom/hum_18_0", "volume": 0.728, "pitch": 1.10 },
+				{ "name": "sounds/custom/hum_18_1", "volume": 0.739, "pitch": 1.20 },
+				{ "name": "sounds/custom/hum_18_2", "volume": 0.740, "pitch": 1.30 },
+			],
+		},
+		"bench.hum_19": {
+			"category": "ambient",
+			"sounds": [
+				{ "name": "sounds/custom/hum_19_0", "volume": 0.829, "pitch": 1.10 },
+				{ "name": "sounds/custom/hum_19_1", "volume": 0.830, "pitch": 1.20 },
+				{ "name": "sounds/custom/hum_19_2", "volume": 0.841, "pitch": 1.30 },
+			],
+		},
+		"bench.hum_20": {
+			"category": "ambient",
+			"sounds": [
+				{ "name": "sounds/custom/hum_20_0", "volume": 0.520, "pitch": 1.10 },
+				{ "name": "sounds/custom/hum_20_1", "volume": 0.531, "pitch": 1.20 },
+				{ "name": "sounds/custom/hum_20_2", "volume": 0.542, "pitch": 1.30 },
+			],
+		},
+		"bench.hum_21": {
+			"category": "ambient",
+			"sounds": [
+				{ "name": "sounds/custom/hum_21_0", "volume": 0.621, "pitch": 1.10 },
+				{ "name": "sounds/custom/hum_21_1", "volume": 0.632, "pitch": 1.20 },
+				{ "name": "sounds/custom/hum_21_2", "volume": 0.643, "pitch": 1.30 },
+			],
+		},
+		"bench.hum_22": {
+			"category": "ambient",
+			"sounds": [
+				{ "name": "sounds/custom/hum_22_0", "volume": 0.722, "pitch": 1.10 },
+				{ "name": "sounds/custom/hum_22_1", "volume": 0.733, "pitch": 1.20 },
+				{ "name": "sounds/custom/hum_22_2", "volume": 0.744, "pitch": 1.30 },
+			],
+		},
+		"bench.hum_23": {
+			"category": "ambient",
+			"sounds": [
+				{ "name": "sounds/custom/hum_23_0", "volume": 0.823, "pitch": 1.10 },
+				{ "name": "sounds/custom/hum_23_1", "volume": 0.834, "pitch": 1.20 },
+				{ "name": "sounds/custom/hum_23_2", "volume": 0.845, "pitch": 1.30 },
+			],
+		},
+		"bench.hum_24": {
+			"category": "ambient",
+			"sounds": [
+				{ "name": "sounds/custom/hum_24_0", "volume": 0.524, "pitch": 1.10 },
+				{ "name": "sounds/custom/hum_24_1", "volume": 0.535, "pitch": 1.20 },
+				{ "name": "sounds/custom/hum_24_2", "volume": 0.546, "pitch": 1.30 },
+			],
+		},
+		"bench.hum_25": {
+			"category": "ambient",
+			"sounds": [
+				{ "name": "sounds/custom/hum_25_0", "volume": 0.625, "pitch": 1.10 },
+				{ "name": "sounds/custom/hum_25_1", "volume": 0.636, "pitch": 1.20 },
+				{ "name": "sounds/custom/hum_25_2", "volume": 0.647, "pitch": 1.30 },
+			],
+		},
+		"bench.hum_26": {
+			"category": "ambient",
+			"sounds": [
+				{ "name": "sounds/custom/hum_26_0", "volume": 0.726, "pitch": 1.10 },
+				{ "name": "sounds/custom/hum_26_1", "volume": 0.737, "pitch": 1.20 },
+				{ "name": "sounds/custom/hum_26_2", "volume": 0.748, "pitch": 1.30 },
+			],
+		},
+		"bench.hum_27": {
+			"category": "ambient",
+			"sounds": [
+				{ "name": "sounds/custom/hum_27_0", "volume": 0.827, "pitch": 1.10 },
+				{ "name": "sounds/custom/hum_27_1", "volume": 0.838, "pitch": 1.20 },
+				{ "name": "sounds/custom/hum_27_2", "volume": 0.849, "pitch": 1.30 },
+			],
+		},
+		"bench.hum_28": {
+			"category": "ambient",
+			"sounds": [
+				{ "name": "sounds/custom/hum_28_0", "volume": 0.528, "pitch": 1.10 },
+				{ "name": "sounds/custom/hum_28_1", "volume": 0.539, "pitch": 1.20 },
+				{ "name": "sounds/custom/hum_28_2", "volume": 0.540, "pitch": 1.30 },
+			],
+		},
+		"bench.hum_29": {
+			"category": "ambient",
+			"sounds": [
+				{ "name": "sounds/custom/hum_29_0", "volume": 0.629, "pitch": 1.10 },
+				{ "name": "sounds/custom/hum_29_1", "volume": 0.630, "pitch": 1.20 },
+				{ "name": "sounds/custom/hum_29_2", "volume": 0.641, "pitch": 1.30 },
+			],
+		},
+	}
+}

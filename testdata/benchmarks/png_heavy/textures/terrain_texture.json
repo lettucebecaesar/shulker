@@ -1,0 +1,28 @@
+{
+	"texture_data": {
+		"bench.sprite_00": {"textures": "textures/custom/s_00"},
+		"bench.sprite_01": {"textures": "textures/custom/s_01"},
+		"bench.sprite_02": {"textures": "textures/custom/s_02"},
+		"bench.sprite_03": {"textures": "textures/custom/s_03"},
+		"bench.sprite_04": {"textures": "textures/custom/s_04"},
+		"bench.sprite_05": {"textures": "textures/custom/s_05"},
+		"bench.sprite_06": {"textures": "textures/custom/s_06"},
+		"bench.sprite_07": {"textures": "textures/custom/s_07"},
+		"bench.sprite_08": {"textures": "textures/custom/s_08"},
+		"bench.sprite_09": {"textures": "textures/custom/s_09"},
+		"bench.sprite_10": {"textures": "textures/custom/s_10"},
+		"bench.sprite_11": {"textures": "textures/custom/s_11"},
+		"bench.sprite_12": {"textures": "textures/custom/s_12"},
+		"bench.sprite_13": {"textures": "textures/custom/s_13"},
+		"bench.sprite_14": {"textures": "textures/custom/s_14"},
+		"bench.sprite_15": {"textures": "textures/custom/s_15"},
+		"bench.sprite_16": {"textures": "textures/custom/s_16"},
+		"bench.sprite_17": {"textures": "textures/custom/s_17"},
+		"bench.sprite_18": {"textures": "textures/custom/s_18"},
+		"bench.sprite_19": {"textures": "textures/custom/s_19"},
+		"bench.sprite_20": {"textures": "textures/custom/s_20"},
+		"bench.sprite_21": {"textures": "textures/custom/s_21"},
+		"bench.sprite_22": {"textures": "textures/custom/s_22"},
+		"bench.sprite_23": {"textures": "textures/custom/s_23"},
+	}
+}

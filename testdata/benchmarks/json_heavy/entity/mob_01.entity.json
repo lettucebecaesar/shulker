@@ -1,0 +1,37 @@
+{
+	// Client entity for bench:mob_01
+	"format_version": "1.10.0",
+	"minecraft:client_entity": {
+		"description": {
+			"identifier": "bench:mob_01",
+			"materials": { "default": "entity_alphatest" },
+			"textures": {
+				"variant_0": "textures/custom/b_04",
+				"variant_1": "textures/custom/b_05",
+				"variant_2": "textures/custom/b_06",
+				"variant_3": "textures/custom/b_07",
+			},
+			"geometry": { "default": "geometry.mob_01" },
+			"animations": {
+				"anim_0": "animation.mob_01.state_0",
+				"anim_1": "animation.mob_01.state_1",
+				"anim_2": "animation.mob_01.state_2",
+				"anim_3": "animation.mob_01.state_3",
+				"anim_4": "animation.mob_01.state_4",
+				"anim_5": "animation.mob_01.state_5",
+			},
+			"scripts": {
+				"pre_animation": [
+					"v.mood_0 = math.clamp(query.health / query.max_health, 0.0, 1.0);",
+					"v.mood_1 = math.clamp(query.health / query.max_health, 0.0, 1.0);",
+					"v.mood_2 = math.clamp(query.health / query.max_health, 0.0, 1.0);",
+					"v.mood_3 = math.clamp(query.health / query.max_health, 0.0, 1.0);"
+				],
+				"scale": "query.is_baby ? 0.550000011920929 : 1.0"
+			},
+			"render_controllers": [ "controller.render.mob_01" ],
+			"particle_effects": { "aura_1": "bench:aura_1" },
+			"spawn_egg": { "texture": "bench.spawn_egg" }
+		}
+	}
+}

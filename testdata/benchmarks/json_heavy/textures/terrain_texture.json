@@ -1,0 +1,89 @@
+// Terrain atlas — block texture registrations.
+{
+	"resource_pack_name": "json_heavy",
+	"texture_name": "atlas.terrain",
+	"padding": 8,
+	"num_mip_levels": 4,
+	"texture_data": {
+		// plain color map
+		"bench.block_00": {"textures": "textures/custom/b_00"},
+		// variant array (grass_top style)
+		"bench.block_01": {"textures": ["textures/custom/b_01", "textures/custom/b_02"]},
+		// tinted object (grass_side style)
+		"bench.block_02": {"textures": {"path": "textures/custom/b_02", "overlay_color": "#79c05a"}},
+		// tinted array entry
+		"bench.block_03": {"textures": [{"path": "textures/custom/b_03", "tint_color": "#df6827"}]},
+		// plain color map
+		"bench.block_04": {"textures": "textures/custom/b_04"},
+		// variant array (grass_top style)
+		"bench.block_05": {"textures": ["textures/custom/b_05", "textures/custom/b_06"]},
+		// tinted object (grass_side style)
+		"bench.block_06": {"textures": {"path": "textures/custom/b_06", "overlay_color": "#79c05a"}},
+		// tinted array entry
+		"bench.block_07": {"textures": [{"path": "textures/custom/b_07", "tint_color": "#df6827"}]},
+		// plain color map
+		"bench.block_08": {"textures": "textures/custom/b_08"},
+		// variant array (grass_top style)
+		"bench.block_09": {"textures": ["textures/custom/b_09", "textures/custom/b_10"]},
+		// tinted object (grass_side style)
+		"bench.block_10": {"textures": {"path": "textures/custom/b_10", "overlay_color": "#79c05a"}},
+		// tinted array entry
+		"bench.block_11": {"textures": [{"path": "textures/custom/b_11", "tint_color": "#df6827"}]},
+		// plain color map
+		"bench.block_12": {"textures": "textures/custom/b_12"},
+		// variant array (grass_top style)
+		"bench.block_13": {"textures": ["textures/custom/b_13", "textures/custom/b_14"]},
+		// tinted object (grass_side style)
+		"bench.block_14": {"textures": {"path": "textures/custom/b_14", "overlay_color": "#79c05a"}},
+		// tinted array entry
+		"bench.block_15": {"textures": [{"path": "textures/custom/b_15", "tint_color": "#df6827"}]},
+		// plain color map
+		"bench.block_16": {"textures": "textures/custom/b_16"},
+		// variant array (grass_top style)
+		"bench.block_17": {"textures": ["textures/custom/b_17", "textures/custom/b_18"]},
+		// tinted object (grass_side style)
+		"bench.block_18": {"textures": {"path": "textures/custom/b_18", "overlay_color": "#79c05a"}},
+		// tinted array entry
+		"bench.block_19": {"textures": [{"path": "textures/custom/b_19", "tint_color": "#df6827"}]},
+		// plain color map
+		"bench.block_20": {"textures": "textures/custom/b_20"},
+		// variant array (grass_top style)
+		"bench.block_21": {"textures": ["textures/custom/b_21", "textures/custom/b_22"]},
+		// tinted object (grass_side style)
+		"bench.block_22": {"textures": {"path": "textures/custom/b_22", "overlay_color": "#79c05a"}},
+		// tinted array entry
+		"bench.block_23": {"textures": [{"path": "textures/custom/b_23", "tint_color": "#df6827"}]},
+		// plain color map
+		"bench.block_24": {"textures": "textures/custom/b_24"},
+		// variant array (grass_top style)
+		"bench.block_25": {"textures": ["textures/custom/b_25", "textures/custom/b_26"]},
+		// tinted object (grass_side style)
+		"bench.block_26": {"textures": {"path": "textures/custom/b_26", "overlay_color": "#79c05a"}},
+		// tinted array entry
+		"bench.block_27": {"textures": [{"path": "textures/custom/b_27", "tint_color": "#df6827"}]},
+		// plain color map
+		"bench.block_28": {"textures": "textures/custom/b_28"},
+		// variant array (grass_top style)
+		"bench.block_29": {"textures": ["textures/custom/b_29", "textures/custom/b_30"]},
+		// tinted object (grass_side style)
+		"bench.block_30": {"textures": {"path": "textures/custom/b_30", "overlay_color": "#79c05a"}},
+		// tinted array entry
+		"bench.block_31": {"textures": [{"path": "textures/custom/b_31", "tint_color": "#df6827"}]},
+		// plain color map
+		"bench.block_32": {"textures": "textures/custom/b_32"},
+		// variant array (grass_top style)
+		"bench.block_33": {"textures": ["textures/custom/b_33", "textures/custom/b_34"]},
+		// tinted object (grass_side style)
+		"bench.block_34": {"textures": {"path": "textures/custom/b_34", "overlay_color": "#79c05a"}},
+		// tinted array entry
+		"bench.block_35": {"textures": [{"path": "textures/custom/b_35", "tint_color": "#df6827"}]},
+		// plain color map
+		"bench.block_36": {"textures": "textures/custom/b_36"},
+		// variant array (grass_top style)
+		"bench.block_37": {"textures": ["textures/custom/b_37", "textures/custom/b_38"]},
+		// tinted object (grass_side style)
+		"bench.block_38": {"textures": {"path": "textures/custom/b_38", "overlay_color": "#79c05a"}},
+		// tinted array entry
+		"bench.block_39": {"textures": [{"path": "textures/custom/b_39", "tint_color": "#df6827"}]},
+	},
+}

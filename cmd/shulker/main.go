@@ -53,9 +53,10 @@ sets move in lockstep; Molang is never touched; output is byte-deterministic.
 
 func main() {
 	args := os.Args[1:]
-	// Regolith exe filters are invoked as: <shulker> [settingsJSON ...args].
-	// Detect that shape even without the literal "regolith" marker.
-	if len(args) > 0 && looksLikeRegolithInvocation(args) {
+	// Regolith exe filters are invoked as: <shulker> [settingsJSON ...args]
+	// with FILTER_DIR/ROOT_DIR in the environment — and with NO arguments at
+	// all when the filter has no settings. Detect that shape reliably.
+	if looksLikeRegolithInvocation(args) {
 		runRegolith(args)
 		return
 	}
@@ -84,13 +85,26 @@ func main() {
 }
 
 // looksLikeRegolithInvocation reports whether the argv matches how Regolith
-// runs exe filters: a JSON settings blob (and optionally the marker argument
-// "regolith") with no recognized subcommand in front.
+// runs exe filters. Verified against Bedrock-OSS/regolith v1.8
+// (filter_exe.go, utils.go):
+//
+//   - the binary is invoked as <exe> [settingsJSON ...staticArgs], where
+//     the settings JSON is present ONLY when the profile filter has
+//     non-empty settings;
+//   - CWD is the Regolith working dir (.regolith/tmp) containing the staged
+//     pack at ./RP;
+//   - FILTER_DIR and ROOT_DIR are always exported into the environment.
+//
+// The environment pair is the reliable signal; argv alone cannot
+// distinguish "no settings" from "user typed shulker with no command".
 func looksLikeRegolithInvocation(args []string) bool {
 	for _, a := range args {
 		if a == "regolith" {
 			return true
 		}
+	}
+	if os.Getenv("FILTER_DIR") != "" && os.Getenv("ROOT_DIR") != "" {
+		return true
 	}
 	if len(args) >= 1 {
 		trimmed := strings.TrimSpace(args[0])

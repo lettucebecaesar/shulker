@@ -1,0 +1,201 @@
+// UI screen 2 — built by the bench generator.
+{
+	"namespace": "bench_ui",
+	"bench_screen_2": {
+		"type": "panel",
+		"controls": [
+			{
+				// row 0: a labeled icon button
+				"type": "panel",
+				"controls": [
+					{
+						"type": "image",
+						"texture": "textures/custom/b_00",
+						"size": [16, 16],
+					},
+					{
+						"type": "label",
+						"text": "bench_ui.label",
+						"color": "white",
+					},
+				],
+			},
+			{
+				// row 1: a labeled icon button
+				"type": "panel",
+				"controls": [
+					{
+						"type": "image",
+						"texture": "textures/custom/b_00",
+						"size": [16, 16],
+					},
+					{
+						"type": "label",
+						"text": "bench_ui.label",
+						"color": "white",
+					},
+				],
+			},
+			{
+				// row 2: a labeled icon button
+				"type": "panel",
+				"controls": [
+					{
+						"type": "image",
+						"texture": "textures/custom/b_00",
+						"size": [16, 16],
+					},
+					{
+						"type": "label",
+						"text": "bench_ui.label",
+						"color": "white",
+					},
+				],
+			},
+			{
+				// row 3: a labeled icon button
+				"type": "panel",
+				"controls": [
+					{
+						"type": "image",
+						"texture": "textures/custom/b_00",
+						"size": [16, 16],
+					},
+					{
+						"type": "label",
+						"text": "bench_ui.label",
+						"color": "white",
+					},
+				],
+			},
+			{
+				// row 4: a labeled icon button
+				"type": "panel",
+				"controls": [
+					{
+						"type": "image",
+						"texture": "textures/custom/b_00",
+						"size": [16, 16],
+					},
+					{
+						"type": "label",
+						"text": "bench_ui.label",
+						"color": "white",
+					},
+				],
+			},
+			{
+				// row 5: a labeled icon button
+				"type": "panel",
+				"controls": [
+					{
+						"type": "image",
+						"texture": "textures/custom/b_00",
+						"size": [16, 16],
+					},
+					{
+						"type": "label",
+						"text": "bench_ui.label",
+						"color": "white",
+					},
+				],
+			},
+			{
+				// row 6: a labeled icon button
+				"type": "panel",
+				"controls": [
+					{
+						"type": "image",
+						"texture": "textures/custom/b_00",
+						"size": [16, 16],
+					},
+					{
+						"type": "label",
+						"text": "bench_ui.label",
+						"color": "white",
+					},
+				],
+			},
+			{
+				// row 7: a labeled icon button
+				"type": "panel",
+				"controls": [
+					{
+						"type": "image",
+						"texture": "textures/custom/b_00",
+						"size": [16, 16],
+					},
+					{
+						"type": "label",
+						"text": "bench_ui.label",
+						"color": "white",
+					},
+				],
+			},
+			{
+				// row 8: a labeled icon button
+				"type": "panel",
+				"controls": [
+					{
+						"type": "image",
+						"texture": "textures/custom/b_00",
+						"size": [16, 16],
+					},
+					{
+						"type": "label",
+						"text": "bench_ui.label",
+						"color": "white",
+					},
+				],
+			},
+			{
+				// row 9: a labeled icon button
+				"type": "panel",
+				"controls": [
+					{
+						"type": "image",
+						"texture": "textures/custom/b_00",
+						"size": [16, 16],
+					},
+					{
+						"type": "label",
+						"text": "bench_ui.label",
+						"color": "white",
+					},
+				],
+			},
+			{
+				// row 10: a labeled icon button
+				"type": "panel",
+				"controls": [
+					{
+						"type": "image",
+						"texture": "textures/custom/b_00",
+						"size": [16, 16],
+					},
+					{
+						"type": "label",
+						"text": "bench_ui.label",
+						"color": "white",
+					},
+				],
+			},
+			{
+				// row 11: a labeled icon button
+				"type": "panel",
+				"controls": [
+					{
+						"type": "image",
+						"texture": "textures/custom/b_00",
+						"size": [16, 16],
+					},
+					{
+						"type": "label",
+						"text": "bench_ui.label",
+						"color": "white",
+					},
+				],
+			},
+		],
+	},
+}
